@@ -61,7 +61,7 @@ board_include_dirs = [
     "//device/st/entrance_guard/board",
     "//device/st/entrance_guard/board/fs",
     "//kernel/liteos_m/kal/posix/include",
-    "//kernel/liteos_m/components/bounds_checking_function/include",
+    "//third_party/bounds_checking_function/include",
     "//kernel/liteos_m/components/fs/fatfs",
     "//utils/native/lite/include",
     "//kernel/liteos_m/kernel/include",
