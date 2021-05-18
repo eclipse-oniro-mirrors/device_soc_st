@@ -26,11 +26,12 @@ SECTIONS
    *(COMMON)
   }
   _bss_end__ = .;
-  _estack = .;
+  _sstack = .;
   .stack :
   {
     _stack = .;
     *(.stack)
   }
+  _estack = .;
   /DISCARD/ : { *(.note.GNU-stack) *(.gnu_debuglink) *(.gnu.lto_*) }
 }
