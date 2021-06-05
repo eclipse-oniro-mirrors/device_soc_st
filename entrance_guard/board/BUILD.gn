@@ -16,4 +16,5 @@ static_library("board") {
     "//kernel/liteos_m/kal/cmsis"
   ]
 
+  deps = [ "//kernel/liteos_m/kal/posix" ]
 }
