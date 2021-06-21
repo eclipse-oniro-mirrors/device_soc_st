@@ -118,6 +118,8 @@ extern "C" {
 
 //#define LOSCFG_DEBUG_HOOK                                   1
 
+#define LOSCFG_KERNEL_PM                                    0
+
 #ifdef __cplusplus
 #if __cplusplus
 }
