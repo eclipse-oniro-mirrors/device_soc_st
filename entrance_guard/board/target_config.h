@@ -103,8 +103,6 @@ extern "C" {
 ============================================================================= */
 #define LOSCFG_KERNEL_PRINTF                                1
 
-#define LOSCFG_BASE_CORE_SCHED_SLEEP                        0
-
 #define LOSCFG_BACKTRACE_TYPE                               1
 
 #define LOSCFG_BASE_CORE_TSK_MONITOR                        1
@@ -116,9 +114,9 @@ extern "C" {
 #define LOSCFG_BASE_MEM_NODE_INTEGRITY_CHECK                1
 #define LOSCFG_MEM_LEAKCHECK                                1
 
-//#define LOSCFG_DEBUG_HOOK                                   1
+#define LOSCFG_DEBUG_HOOK                                   1
 
-#define LOSCFG_KERNEL_PM                                    0
+#define LOSCFG_KERNEL_PM                                    1
 
 #ifdef __cplusplus
 #if __cplusplus

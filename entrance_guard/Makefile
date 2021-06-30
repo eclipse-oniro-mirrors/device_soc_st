@@ -41,10 +41,10 @@ BIN = $(CP) -O binary -S
 
 LDSCRIPT = default.ld
 
-LIBS = -lc -lm -lnosys -larch -lbacktrace -lcmsis -lcppsupport -lcpup -lexchook -lkernel -lposix -lsec_static -lutils -lposix -lboard -lfatfs
-LIBS += -lbroadcast -ldump_static -lhal_sysparam -lhievent_lite -lsamgr -lsamgr_source -lsysparam -lbootstrap -lhal_token_static -lhiview_lite -lsamgr_adapter -lsec_static -ltoken_static -lutils_kv_store
-LIBDIR = -L$(BUILD_DIR)/libs
-LDFLAGS = -specs=nano.specs -T$(LDSCRIPT) $(LIBDIR) -Wl,--start-group $(LIBS) -Wl,--end-group -Wl,-Map=$(BUILD_DIR)/$(TARGET).map,--cref -Wl,--gc-sections
+LIBS = -lc -lm -lnosys
+LIBDIR = $(BUILD_DIR)/libs
+LIBS += $(foreach x,${LIBDIR}, $(wildcard $(addprefix  ${x}/*, .a)))
+LDFLAGS = -specs=nano.specs -T$(LDSCRIPT) -L$(LIBDIR) -Wl,--start-group $(LIBS) -Wl,--end-group -Wl,-Map=$(BUILD_DIR)/$(TARGET).map,--cref -Wl,--gc-sections
 
 all: $(BUILD_DIR)/$(TARGET).elf $(BUILD_DIR)/$(TARGET).hex $(BUILD_DIR)/$(TARGET).bin
 $(BUILD_DIR)/$(TARGET).elf:

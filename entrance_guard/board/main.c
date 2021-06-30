@@ -39,46 +39,6 @@
 
 VOID TaskSample(VOID);
 
-#if (LOSCFG_BASE_CORE_SCHED_SLEEP == 1)
-#define TIMER_DEMO_IRQ                2
-#define SLEEP_TIME_CYCLE              90000000UL
-#define SLEEP_TIME_MAX_RESPONSE_TIME  ((UINT32)-1)
-#define TIM2_INI_PRIORITY             3
-unsigned long long GetSleepTimeNs(VOID)
-{
-    return 0;
-}
-
-void SleepTimerStop(void)
-{
-    return;
-}
-
-void SleepTimerStart(unsigned long long sleepTimeNs)
-{
-    return;
-}
-
-void TIM2_IRQHandler(void)
-{
-    return;
-}
-
-unsigned int SleepTimerInit(void)
-{
-    /* Timer init */
-
-#if (LOSCFG_USE_SYSTEM_DEFINED_INTERRUPT == 1)
-    UINT32 ret = HalHwiCreate(TIMER_DEMO_IRQ, TIM2_INI_PRIORITY, 0, TIM2_IRQHandler, 0);
-    if (ret != LOS_OK) {
-        printf("SleepTimerInit create time2 irq failed! ERROR: 0x%x\n", ret);
-        return ret;
-    }
-#endif
-
-    return LOS_OK;
-}
-#endif
 
 /*****************************************************************************
  Function    : main
@@ -97,19 +57,11 @@ LITE_OS_SEC_TEXT_INIT int main(void)
 
     ret = LOS_KernelInit();
     if (ret == LOS_OK) {
-#if (LOSCFG_BASE_CORE_SCHED_SLEEP == 1)
-    ret = LOS_SchedSleepInit(SleepTimerInit, SleepTimerStart, SleepTimerStop, GetSleepTimeNs);
-    if (ret != LOS_OK) {
-        goto EXIT;
-    }
-#endif
         TaskSample();
         LOS_Start();
     }
 
-#if (LOSCFG_BASE_CORE_SCHED_SLEEP == 1)
 EXIT:
-#endif
     while (1) {
         __asm volatile("wfi");
     }
