@@ -7,6 +7,7 @@
 #include "los_compiler.h"
 #include "los_swtmr.h"
 #include "los_sched.h"
+#include "los_pm.h"
 
 #ifdef __cplusplus
 #if __cplusplus
@@ -311,6 +312,19 @@ UINT32 TaskSample(VOID)
 {
     UINT32  ret;
     TSK_INIT_PARAM_S task = { 0 };
+
+#if (LOSCFG_KERNEL_PM == 1)
+    (VOID)LOS_PmRegister(LOS_PM_TYPE_DEVICE, NULL);
+
+    (VOID)LOS_PmUnregister(LOS_PM_TYPE_DEVICE, NULL);
+
+    (VOID)LOS_PmModeSet(LOS_PmModeGet());
+
+    (VOID)LOS_PmLockRequest("lock");
+
+    (VOID)LOS_PmLockRelease("lock");
+#endif
+
     task.pfnTaskEntry = (TSK_ENTRY_FUNC)TaskSampleEntry1;
     task.uwStackSize  = OS_SAMPLE_TASK_STACK_SIZE;
     task.pcName       = "taskSampleEntry1";

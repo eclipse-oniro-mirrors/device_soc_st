@@ -13,7 +13,8 @@ static_library("board") {
     "//kernel/liteos_m/kernel/include",
     "//kernel/liteos_m/kernel/arch/include",
     "//kernel/liteos_m/utils",
-    "//kernel/liteos_m/kal/cmsis"
+    "//kernel/liteos_m/kal/cmsis",
+    "//kernel/liteos_m/components/power"
   ]
 
   deps = [ "//kernel/liteos_m/kal/posix" ]
