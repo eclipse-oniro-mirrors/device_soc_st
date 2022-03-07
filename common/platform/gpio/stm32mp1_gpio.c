@@ -275,7 +275,7 @@ static void GpioClearIrqUnsafe(struct GpioGroup *group, uint16_t bitNum)
 }
 static int32_t Mp15xGpioSetIrq(struct GpioCntlr *cntlr, uint16_t gpio, uint16_t mode)
 {
-    int32_t ret ;
+    int32_t ret = HDF_SUCCESS;
     uint32_t irqSave;
     struct GpioGroup *group = NULL;
     unsigned int bitNum = Mp15xToBitNum(gpio);
@@ -521,8 +521,8 @@ static int32_t GpioDriverInit(struct HdfDeviceObject *device)
         return ret;
     }
     dprintf("%s: Enter\r\n", __func__);
-    if (stm32gpio->groupNum > GROUP_MAX || stm32gpio->groupNum = 0 || stm32gpio->bitNum > BIT_MAX ||
-        stm32gpio->bitNum = 0) {
+    if (stm32gpio->groupNum > GROUP_MAX || stm32gpio->groupNum <= 0 || stm32gpio->bitNum > BIT_MAX ||
+        stm32gpio->bitNum <= 0) {
         HDF_LOGE("%s: invalid groupNum:%u or bitNum:%u", __func__, stm32gpio->groupNum,
                  stm32gpio->bitNum);
         return HDF_ERR_INVALID_PARAM;
