@@ -1,3 +1,32 @@
+/**
+  ******************************************************************************
+  * @file    stm32mp1xx.h
+  * @author  MCD Application Team
+  * @brief   CMSIS STM32MP1xx Device Peripheral Access Layer Header File.
+  *
+  *          The file is the unique include file that the application programmer
+  *          is using in the C source code, usually in main.c. This file contains:
+  *           - Configuration section that allows to select:
+  *              - The STM32MP1xx device used in the target application
+  *              - To use or not the peripheral�s drivers in application code(i.e.
+  *                code will be based on direct access to peripheral�s registers
+  *                rather than drivers API), this option is controlled by
+  *                "#define USE_HAL_DRIVER"
+  *
+  ******************************************************************************
+  * @attention
+  *
+  * <h2><center>&copy; Copyright (c) 2019 STMicroelectronics.
+  * All rights reserved.</center></h2>
+  *
+  * This software component is licensed by ST under BSD 3-Clause license,
+  * the "License"; You may not use this file except in compliance with the
+  * License. You may obtain a copy of the License at:
+  *                        opensource.org/licenses/BSD-3-Clause
+  *
+  ******************************************************************************
+  */
+
 #ifndef __STM32MP1xx_H
 #define __STM32MP1xx_H
 
