@@ -125,7 +125,7 @@ static int32_t stm32mp1_uart_config(struct Mp15xUart *uart)
 }
 
 // TODO : get clock source real rate
-static inline int32_t stm32mp1_uart_get_clock_rate(struct Mp15xUart *uart)
+static inline int32_t Mp15xUartGetClock(struct Mp15xUart *uart)
 {
     int ret = HDF_SUCCESS;
 
@@ -142,7 +142,7 @@ static inline int32_t stm32mp1_uart_get_clock_rate(struct Mp15xUart *uart)
     return ret;
 }
 
-static int32_t stm32mp1_uart_open(struct UartHost *host)
+static int32_t Mp15xUartOpen(struct UartHost *host)
 {
     int32_t ret = HDF_SUCCESS;
     struct Mp15xUart *uart = (struct Mp15xUart *)host->priv;
@@ -201,7 +201,7 @@ stm32mp1_uart_open_out:
     return ret;
 }
 
-static int32_t stm32mp1_uart_close(struct UartHost *host)
+static int32_t Mp15xUartClose(struct UartHost *host)
 {
     int32_t ret = HDF_SUCCESS;
     struct Mp15xUart *uart = (struct Mp15xUart *)host->priv;
@@ -229,7 +229,7 @@ stm32mp1_uart_close_out:
     return ret;
 }
 
-static int32_t stm32mp1_uart_read(struct UartHost *host, uint8_t *data, uint32_t size)
+static int32_t Mp15xUartRead(struct UartHost *host, uint8_t *data, uint32_t size)
 {
     int32_t ret = HDF_SUCCESS;
     struct Mp15xUart *uart = (struct Mp15xUart *)host->priv;
@@ -262,7 +262,7 @@ stm32mp1_uart_read_out:
     return ret;
 }
 
-static int32_t stm32mp1_uart_write(struct UartHost *host, uint8_t *data, uint32_t size)
+static int32_t Mp15xUartWrite(struct UartHost *host, uint8_t *data, uint32_t size)
 {
     int32_t ret;
     uint32_t intSave;
@@ -315,7 +315,7 @@ stm32mp1_uart_write_out:
     return send_size;
 }
 
-static int32_t stm32mp1_uart_get_baud(struct UartHost *host, uint32_t *baudRate)
+static int32_t Mp15xUartGetBaud(struct UartHost *host, uint32_t *baudRate)
 {
     int32_t ret = HDF_SUCCESS;
     struct Mp15xUart *uart = (struct Mp15xUart *)host->priv;
@@ -334,7 +334,7 @@ stm32mp1_uart_get_baud_out:
     return ret;
 }
 
-static int32_t stm32mp1_uart_set_baud(struct UartHost *host, uint32_t baudRate)
+static int32_t Mp15xUartSetBaud(struct UartHost *host, uint32_t baudRate)
 {
     int32_t ret = HDF_SUCCESS;
     struct Mp15xUart *uart = (struct Mp15xUart *)host->priv;
@@ -352,7 +352,7 @@ static int32_t stm32mp1_uart_set_baud(struct UartHost *host, uint32_t baudRate)
         Mp15xUartHwEnable(uart, false);
 
         // 2. update clock rate
-        stm32mp1_uart_get_clock_rate(uart);
+        Mp15xUartGetClock(uart);
 
         // 3. set regs
         Mp15xUartHwBaudrate(uart, baudRate);
@@ -368,7 +368,7 @@ stm32mp1_uart_set_baud_out:
     return ret;
 }
 
-static int32_t stm32mp1_uart_get_attribute(struct UartHost *host, struct UartAttribute *attribute)
+static int32_t Mp15xUartGetAttribute(struct UartHost *host, struct UartAttribute *attribute)
 {
     int32_t ret = HDF_SUCCESS;
     struct Mp15xUart *uart = (struct Mp15xUart *)host->priv;
@@ -383,7 +383,7 @@ static int32_t stm32mp1_uart_get_attribute(struct UartHost *host, struct UartAtt
     return ret;
 }
 
-static int32_t stm32mp1_uart_set_attribute(struct UartHost *host, struct UartAttribute *attribute)
+static int32_t Mp15xUartSetAttribute(struct UartHost *host, struct UartAttribute *attribute)
 {
     int32_t ret = HDF_SUCCESS;
     struct Mp15xUart *uart = (struct Mp15xUart *)host->priv;
@@ -409,7 +409,7 @@ stm32mp1_uart_set_attribute_out:
     return ret;
 }
 
-static int32_t stm32mp1_uart_set_trans_mode(struct UartHost *host, enum UartTransMode mode)
+static int32_t Mp15xUartSetTransMode(struct UartHost *host, enum UartTransMode mode)
 {
     int32_t ret = HDF_SUCCESS;
     struct Mp15xUart *uart = (struct Mp15xUart *)host->priv;
@@ -426,14 +426,6 @@ static int32_t stm32mp1_uart_set_trans_mode(struct UartHost *host, enum UartTran
         uart->flags &= ~UART_FLG_RD_BLOCK;
         OsalSemPost(&(rx_ctl->rx_sem));
         break;
-    // case UART_MODE_DMA_RX_EN:
-    //     break;
-    // case UART_MODE_DMA_RX_DIS:
-    //     break;
-    // case UART_MODE_DMA_TX_EN:
-    //     break;
-    // case UART_MODE_DMA_TX_DIS:
-    //     break;
     default:
         HDF_LOGE("%s: unsupport mode %#x.\r\n", __func__, mode);
         break;
@@ -444,21 +436,16 @@ static int32_t stm32mp1_uart_set_trans_mode(struct UartHost *host, enum UartTran
     return ret;
 }
 
-// static int32_t stm32mp1_uart_poll_event(struct UartHost *host, void *filep, void *table)
-// {
-//     return HDF_SUCCESS;
-// }
-
 struct UartHostMethod g_stm32mp1_uart_ops = {
-    .Init = stm32mp1_uart_open,
-    .Deinit = stm32mp1_uart_close,
-    .Read = stm32mp1_uart_read,
-    .Write = stm32mp1_uart_write,
-    .GetBaud = stm32mp1_uart_get_baud,
-    .SetBaud = stm32mp1_uart_set_baud,
-    .GetAttribute = stm32mp1_uart_get_attribute,
-    .SetAttribute = stm32mp1_uart_set_attribute,
-    .SetTransMode = stm32mp1_uart_set_trans_mode,
+    .Init = Mp15xUartOpen,
+    .Deinit = Mp15xUartClose,
+    .Read = Mp15xUartRead,
+    .Write = Mp15xUartWrite,
+    .GetBaud = Mp15xUartGetBaud,
+    .SetBaud = Mp15xUartSetBaud,
+    .GetAttribute = Mp15xUartGetAttribute,
+    .SetAttribute = Mp15xUartSetAttribute,
+    .SetTransMode = Mp15xUartSetTransMode,
     .pollEvent = NULL
 };
 
@@ -535,7 +522,7 @@ static int32_t stm32mp1_uart_read_drs(struct Mp15xUart *uart, const struct Devic
     return HDF_SUCCESS;
 }
 
-static int32_t stm32mp1_uart_bind(struct HdfDeviceObject *device)
+static int32_t Mp15xUartBind(struct HdfDeviceObject *device)
 {
     int32_t ret;
     struct UartHost *host = NULL;
@@ -596,7 +583,7 @@ static int32_t stm32mp1_uart_bind(struct HdfDeviceObject *device)
     return HDF_SUCCESS;
 }
 
-static int32_t stm32mp1_uart_init(struct HdfDeviceObject *device)
+static int32_t Mp15xUartInit(struct HdfDeviceObject *device)
 {
     int32_t ret = HDF_SUCCESS;
     struct UartHost *host = NULL;
@@ -630,7 +617,7 @@ static int32_t stm32mp1_uart_init(struct HdfDeviceObject *device)
     Mp15xUartDump(uart);
 
     // 2. get new clock rate
-    stm32mp1_uart_get_clock_rate(uart);
+    Mp15xUartGetClock(uart);
 
     // 3. disable uart
     Mp15xUartHwEnable(uart, false);
@@ -659,7 +646,7 @@ stm32mp1_uart_init_out:
     return ret;
 }
 
-static void stm32mp1_uart_release(struct HdfDeviceObject *device)
+static void Mp15xUartRelease(struct HdfDeviceObject *device)
 {
     struct UartHost *host = NULL;
     struct Mp15xUart *uart = NULL;
@@ -710,9 +697,9 @@ static void stm32mp1_uart_release(struct HdfDeviceObject *device)
 
 struct HdfDriverEntry g_hdf_driver_uart_entry = {
     .moduleVersion = 1,
-    .Bind = stm32mp1_uart_bind,
-    .Init = stm32mp1_uart_init,
-    .Release = stm32mp1_uart_release,
-    .moduleName = "Mp15xUart",
+    .Bind = Mp15xUartBind,
+    .Init = Mp15xUartInit,
+    .Release = Mp15xUartRelease,
+    .moduleName = "stm32mp1_uart",
 };
 HDF_INIT(g_hdf_driver_uart_entry);

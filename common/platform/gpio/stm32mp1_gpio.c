@@ -275,7 +275,7 @@ static void GpioClearIrqUnsafe(struct GpioGroup *group, uint16_t bitNum)
 }
 static int32_t Mp15xGpioSetIrq(struct GpioCntlr *cntlr, uint16_t gpio, uint16_t mode)
 {
-    int32_t ret = HDF_SUCCESS;
+    int32_t ret ;
     uint32_t irqSave;
     struct GpioGroup *group = NULL;
     unsigned int bitNum = Mp15xToBitNum(gpio);
@@ -316,14 +316,14 @@ static int32_t Mp15xGpioSetIrq(struct GpioCntlr *cntlr, uint16_t gpio, uint16_t 
 static int32_t Mp15xGpioUnsetIrq(struct GpioCntlr *cntlr, uint16_t gpio)
 {
     int32_t ret = HDF_SUCCESS;
-    struct Mp15xGpioCntlr *gCntlr = NULL;
+    // struct Mp15xGpioCntlr *gCntlr = NULL;
 
     if (cntlr == NULL || cntlr->priv == NULL) {
         HDF_LOGE("%s: GpioCntlr or cntlr.priv null!", __func__);
         return HDF_ERR_INVALID_OBJECT;
     }
 
-    gCntlr = (struct Mp15xGpioCntlr *)cntlr->priv;
+    // gCntlr = (struct Mp15xGpioCntlr *)cntlr->priv;
 
 
     return ret;
@@ -332,7 +332,7 @@ static int32_t Mp15xGpioUnsetIrq(struct GpioCntlr *cntlr, uint16_t gpio)
 static int32_t Mp15xGpioEnableIrq(struct GpioCntlr *cntlr, uint16_t gpio)
 {
     int32_t ret = HDF_SUCCESS;
-    struct Mp15xGpioCntlr *gCntlr = NULL;
+    // struct Mp15xGpioCntlr *gCntlr = NULL;
     struct GpioGroup *group = NULL;
     unsigned int bitNum = Mp15xToBitNum(gpio);
 
@@ -359,7 +359,7 @@ static int32_t Mp15xGpioEnableIrq(struct GpioCntlr *cntlr, uint16_t gpio)
     EXTI_ConfigStructure.Mode = EXTI_MODE_C1_INTERRUPT;
     
     HAL_EXTI_SetConfigLine(&hexti, &EXTI_ConfigStructure);
-    gCntlr = (struct Mp15xGpioCntlr *)cntlr->priv;
+    // gCntlr = (struct Mp15xGpioCntlr *)cntlr->priv;
 
     return ret;
 }
@@ -509,7 +509,7 @@ static int32_t GpioDriverInit(struct HdfDeviceObject *device)
     int32_t ret;
     struct Mp15xGpioCntlr *stm32gpio = &g_Mp15xGpioCntlr;
 
-    dprintf("%s: Enter", __func__);
+    dprintf("%s: Enter\r\n", __func__);
     if (device == NULL || device->property == NULL) {
         HDF_LOGE("%s: device or property NULL!", __func__);
         return HDF_ERR_INVALID_OBJECT;
@@ -520,26 +520,28 @@ static int32_t GpioDriverInit(struct HdfDeviceObject *device)
         HDF_LOGE("%s: get gpio device resource fail:%d", __func__, ret);
         return ret;
     }
-
-    if (stm32gpio->groupNum > GROUP_MAX || stm32gpio->groupNum <= 0 || stm32gpio->bitNum > BIT_MAX ||
-        stm32gpio->bitNum <= 0) {
+    dprintf("%s: Enter\r\n", __func__);
+    if (stm32gpio->groupNum > GROUP_MAX || stm32gpio->groupNum = 0 || stm32gpio->bitNum > BIT_MAX ||
+        stm32gpio->bitNum = 0) {
         HDF_LOGE("%s: invalid groupNum:%u or bitNum:%u", __func__, stm32gpio->groupNum,
                  stm32gpio->bitNum);
         return HDF_ERR_INVALID_PARAM;
     }
+    dprintf("%s: Enter\r\n", __func__);
     //寄存器地址映射
     stm32gpio->regBase = OsalIoRemap(stm32gpio->gpioPhyBase, stm32gpio->groupNum * stm32gpio->gpioRegStep);
     if (stm32gpio->regBase == NULL) {
         HDF_LOGE("%s: err remap phy:0x%x", __func__, stm32gpio->gpioPhyBase);
         return HDF_ERR_IO;
     }
+    dprintf("%s: Enter\r\n", __func__);
     /* OsalIoRemap: remap registers */
     stm32gpio->exitBase = OsalIoRemap(stm32gpio->irqPhyBase, stm32gpio->iqrRegStep);
     if (stm32gpio->exitBase == NULL) {
         dprintf("%s: OsalIoRemap fail!", __func__);
         return -1;
     }
-
+    dprintf("%s: Enter\r\n", __func__);
     ret = InitGpioCntlrMem(stm32gpio);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%s: err init cntlr mem:%d", __func__, ret);
@@ -547,6 +549,7 @@ static int32_t GpioDriverInit(struct HdfDeviceObject *device)
         stm32gpio->regBase = NULL;
         return ret;
     }
+    dprintf("%s: Enter\r\n", __func__);
     stm32gpio->cntlr.count = stm32gpio->groupNum * stm32gpio->bitNum;
     stm32gpio->cntlr.priv = (void *)device->property;
     // stm32gpio->cntlr.device = device;
@@ -556,6 +559,7 @@ static int32_t GpioDriverInit(struct HdfDeviceObject *device)
         HDF_LOGE("%s: err add controller: %d", __func__, ret);
         return ret;
     }
+    dprintf("%s: Enter\r\n", __func__);
     HDF_LOGE("%s: dev service:%s init success!", __func__, HdfDeviceGetServiceName(device));
     return ret;
 }
@@ -571,17 +575,14 @@ static void GpioDriverRelease(struct HdfDeviceObject *device)
         return;
     }
 
-    // gpioCntlr = GpioCntlrFromDevice(device);
-    // if (gpioCntlr == NULL) {
-    //     HDF_LOGE("%s: no service bound!", __func__);
-    //     return;
-    // }
     GpioCntlrRemove(gpioCntlr);
-
+    HDF_LOGD("%s: Enter", __func__);
     stm32gpioGpioCntlr = (struct Mp15xGpioCntlr *)gpioCntlr;
     ReleaseGpioCntlrMem(stm32gpioGpioCntlr);
+    HDF_LOGD("%s: Enter", __func__);
     OsalIoUnmap((void *)stm32gpioGpioCntlr->regBase);
     stm32gpioGpioCntlr->regBase = NULL;
+    HDF_LOGD("%s: Enter", __func__);
 }
 
 /* HdfDriverEntry definition */
