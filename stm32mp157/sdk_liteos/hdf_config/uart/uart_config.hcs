@@ -1,0 +1,22 @@
+root {
+    platform {
+        template uart_controller {
+            num = 0;
+            baudrate = 115200;
+            flags = 4;
+            reg_base = 0x12040000;
+            reg_step = 0x400;
+            interrupt = 39;
+            rx_buf_size = 0x1000;           // default rx_buf_size 4096
+            clock_rate = 64000000;          // clock_rate 64M
+            fifo_en = true;
+        }
+
+        controller_0x40010000 :: uart_controller {
+            match_attr = "stm32mp1_uart_4";
+            num = 4;
+            reg_base = 0x40010000;
+            interrupt = 84;
+        }
+    }
+}
