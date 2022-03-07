@@ -1,0 +1,30 @@
+root {
+    platform {
+        template iwdg_controller {
+            
+            num = 0;                // iwdg num
+
+            reg_base = 0x5C003000;
+            reg_step = 0x400;
+
+            timeout_sec = 32;       // default iwdg timeout(s)
+
+            auto_feed = false;
+            auto_feed_period = 10;
+
+            start = false;
+
+            clock_rate = 32000;     // default clock source rate
+        }
+        controller_0x5C003000 :: iwdg_controller {
+            match_attr = "stm32mp1_iwdg_0";
+        }
+        controller_0x5A002000 :: iwdg_controller {
+            match_attr = "stm32mp1_iwdg_1";
+            num = 1;
+            reg_base = 0x5A002000;
+            auto_feed = true;
+            start = true;
+        }
+    }
+}
