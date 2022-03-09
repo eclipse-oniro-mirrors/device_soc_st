@@ -16,7 +16,7 @@ config SOC_COMPANY_STMICROELECTRONICS
 
 if SOC_COMPANY_STMICROELECTRONICS
 config SOC_COMPANY
-    default "stmicroelectronics"
+    default "st"
 
 rsource "*/Kconfig.liteos_m.soc"
 endif # SOC_COMPANY_STMICROELECTRONICS
