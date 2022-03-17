@@ -1,6 +1,5 @@
-/*
- * Copyright 2021 yhuan416
- *
+/* 
+ * Copyright (c) 2022 Nanjing Xiaoxiongpai Intelligent Technology CO., LIMITED.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,13 +12,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "arm-smccc.h"
+
+#include "stm32mp1_smp.h"
 
 #define PSCI_FN_CPU_ON (0x84000003)
 int Mp1SmpSecCoreOn(unsigned int cpuid, unsigned int entry_point)
 {
 	unsigned int fn = PSCI_FN_CPU_ON;
-    struct arm_smccc_res res = {0};
-    arm_smccc_smc(fn, cpuid, entry_point, 0, 0, 0, 0, 0, &res);
+    struct smp_res res = {0};
+    smp_smc(fn, cpuid, entry_point, 0, 0, 0, 0, 0, &res);
     return res.a0;
 }

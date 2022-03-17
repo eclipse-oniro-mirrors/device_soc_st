@@ -1,5 +1,5 @@
-/*
- * Copyright (c) 2021 Nanjing Xiaoxiongpai Intelligent Technology CO., LIMITED.
+/* 
+ * Copyright (c) 2022 Nanjing Xiaoxiongpai Intelligent Technology CO., LIMITED.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,29 +13,28 @@
  * limitations under the License.
  */
 
-#ifndef __ARM_SMCCC_H__
-#define __ARM_SMCCC_H__
+#ifndef __STM32MP1_SMP_H__
+#define __STM32MP1_SMP_H__
 
-struct arm_smccc_res {
+struct smp_res {
 	unsigned long a0;
 	unsigned long a1;
 	unsigned long a2;
 	unsigned long a3;
 };
 
-struct arm_smccc_quirk {
+struct smp_quirk {
 	int	id;
 	union {
 		unsigned long a6;
 	} state;
 };
 
-void __arm_smccc_smc(unsigned long a0, unsigned long a1,
+void __smp_smc(unsigned long a0, unsigned long a1,
 			unsigned long a2, unsigned long a3, unsigned long a4,
 			unsigned long a5, unsigned long a6, unsigned long a7,
-			struct arm_smccc_res *res, struct arm_smccc_quirk *quirk);
+			struct smp_res *res, struct smp_quirk *quirk);
 
-#define arm_smccc_smc(...) __arm_smccc_smc(__VA_ARGS__, 0)
-#define arm_smccc_smc_quirk(...) __arm_smccc_smc(__VA_ARGS__)
+#define smp_smc(...) __smp_smcc(__VA_ARGS__, 0)
 
-#endif /*__ARM_SMCCC_H*/
+#endif /*__STM32MP1_SMP_H__*/
