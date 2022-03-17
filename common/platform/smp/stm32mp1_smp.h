@@ -35,6 +35,6 @@ void __smp_smc(unsigned long a0, unsigned long a1,
 			unsigned long a5, unsigned long a6, unsigned long a7,
 			struct smp_res *res, struct smp_quirk *quirk);
 
-#define smp_smc(...) __smp_smcc(__VA_ARGS__, 0)
+#define smp_smc(...) __smp_smc(__VA_ARGS__, 0)
 
 #endif /*__STM32MP1_SMP_H__*/
