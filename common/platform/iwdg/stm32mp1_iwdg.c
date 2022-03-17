@@ -272,6 +272,7 @@ static int32_t Mp15xIwdgFeed(struct WatchdogCntlr *wdt)
 
 static int32_t Mp15xIwdgGetStatus(struct WatchdogCntlr *wdt, int32_t *status)
 {
+    (void)status;
     int32_t ret = WATCHDOG_STOP;
     struct Mp15xIwdg *iwdg = NULL;
 

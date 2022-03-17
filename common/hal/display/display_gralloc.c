@@ -179,13 +179,9 @@ static int32_t AllocMem(const AllocInfo* info, BufferHandle **buffer)
     DISPLAY_CHK_RETURN(((bufferHdl->size > MAX_MALLOC_SIZE) || (bufferHdl->size == 0)),
         DISPLAY_FAILURE, HDF_LOGE("%s: size is invalid %d ", __func__, bufferHdl->size););
 
-    /*****海思强绑定******/
-    // if (bufferHdl->usage == HBM_USE_MEM_SHARE) {
-        ret = AllocShm(bufferHdl);
-    // } else {
-    //     dprintf(1,"%s: not support memory usage: 0x%" PRIx64 "", __func__, bufferHdl->usage);
-    //     ret = DISPLAY_NOT_SUPPORT;
-    // }
+
+    ret = AllocShm(bufferHdl);
+
 OUT:
     if ((ret != DISPLAY_SUCCESS) && (bufferHdl != NULL)) {
         free(bufferHdl);
@@ -213,13 +209,10 @@ static void FreeMem(BufferHandle *buffer)
         HDF_LOGE("%s: size is invalid, buffer->size = %d", __func__, buffer->size);
         return;
     }
-    /*****海思强绑定******/
-    // if (buffer->usage == HBM_USE_MEM_SHARE) {
-        FreeShm(buffer);
-        return;
-    // } else {
-    //     HDF_LOGE("%s: not support memory usage: 0x%" PRIx64 "", __func__, buffer->usage);
-    // }
+
+    FreeShm(buffer);
+    return;
+
 }
 
 static void *Mmap(BufferHandle *buffer)
@@ -242,7 +235,6 @@ static void *Mmap(BufferHandle *buffer)
     }
     ((PriBufferHandle*)buffer)->shmid = shmid;
     buffer->virAddr = pBase;
-    HDF_LOGI("%s: Mmap shared memory succeed", __func__);
     return pBase;
 }
 
@@ -258,11 +250,6 @@ static int32_t Unmap(BufferHandle *buffer)
     if (shmdt(buffer->virAddr) == -1) {
         HDF_LOGE("%s: Fail to unmap shared memory errno =  %d", __func__, errno);
         return DISPLAY_FAILURE;
-    }
-    int32_t shmid = ((PriBufferHandle*)buffer)->shmid;
-    dprintf(1,"Unmap------------%d\r\n", shmid);
-    if ((shmid != INVALID_SHMID) && (shmctl(shmid, IPC_RMID, 0) == -1)) {
-        HDF_LOGE("%s: Fail to free shmid, errno = %d", __func__, errno);
     }
     return DISPLAY_SUCCESS;
 }

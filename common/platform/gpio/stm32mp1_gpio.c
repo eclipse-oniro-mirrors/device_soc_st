@@ -57,7 +57,7 @@ static int32_t Mp15xGetGroupByGpioNum(struct GpioCntlr *cntlr, uint16_t gpio, st
 static int32_t Mp15xGpioSetDir(struct GpioCntlr *cntlr, uint16_t gpio, uint16_t dir)
 {
     int32_t ret;
-    uint32_t irqSave;
+    
     unsigned int val;
     volatile unsigned char *addr = NULL;
 
@@ -70,7 +70,7 @@ static int32_t Mp15xGpioSetDir(struct GpioCntlr *cntlr, uint16_t gpio, uint16_t 
         return ret;
     }
 
-    if (OsalSpinLockIrqSave(&group->lock, &irqSave) != HDF_SUCCESS) {
+    if (OsalSpinLockIrqSave(&group->lock, &group->irqSave) != HDF_SUCCESS) {
         HDF_LOGE("OsalSpinLockIrqSave failed\n");
         return HDF_ERR_DEVICE_BUSY;
     }
@@ -83,7 +83,7 @@ static int32_t Mp15xGpioSetDir(struct GpioCntlr *cntlr, uint16_t gpio, uint16_t 
         val |= (0X1 << (bitNum*2)); /* bit0:1 设置 01 */
     }
     OSAL_WRITEL(val, addr);
-    (void)OsalSpinUnlockIrqRestore(&group->lock, &irqSave);
+    (void)OsalSpinUnlockIrqRestore(&group->lock, &group->irqSave);
     return HDF_SUCCESS;
 }
 static int32_t Mp15xGpioGetDir(struct GpioCntlr *cntlr, uint16_t gpio, uint16_t *dir)
@@ -111,7 +111,7 @@ static int32_t Mp15xGpioGetDir(struct GpioCntlr *cntlr, uint16_t gpio, uint16_t 
 static int32_t Mp15xGpioWrite(struct GpioCntlr *cntlr, uint16_t gpio, uint16_t val)
 {
     int32_t ret;
-    uint32_t irqSave;
+    
     unsigned int valCur;
     unsigned int bitNum = Mp15xToBitNum(gpio);
     volatile unsigned char *addr = NULL;
@@ -121,7 +121,7 @@ static int32_t Mp15xGpioWrite(struct GpioCntlr *cntlr, uint16_t gpio, uint16_t v
     if (ret != HDF_SUCCESS) {
         return ret;
     }
-    if (OsalSpinLockIrqSave(&group->lock, &irqSave) != HDF_SUCCESS) {
+    if (OsalSpinLockIrqSave(&group->lock, &group->irqSave) != HDF_SUCCESS) {
         return HDF_ERR_DEVICE_BUSY;
     }
     addr = STM32MP15X_GPIO_BSRR(group->regBase);
@@ -133,7 +133,7 @@ static int32_t Mp15xGpioWrite(struct GpioCntlr *cntlr, uint16_t gpio, uint16_t v
         valCur |= (0x1 << bitNum);
     }
     OSAL_WRITEL(valCur, addr);
-    (void)OsalSpinUnlockIrqRestore(&group->lock, &irqSave);
+    (void)OsalSpinUnlockIrqRestore(&group->lock, &group->irqSave);
 
     return HDF_SUCCESS;
 }
@@ -164,6 +164,7 @@ static int32_t Mp15xGpioRead(struct GpioCntlr *cntlr, uint16_t gpio, uint16_t *v
 static uint32_t IrqHandleNoShare(uint32_t irq, void *data)
 {
     unsigned int i;
+    (void)irq;
     struct GpioGroup *group = (struct GpioGroup *)data;
 
     if (data == NULL) {
@@ -276,24 +277,22 @@ static void GpioClearIrqUnsafe(struct GpioGroup *group, uint16_t bitNum)
 static int32_t Mp15xGpioSetIrq(struct GpioCntlr *cntlr, uint16_t gpio, uint16_t mode)
 {
     int32_t ret = HDF_SUCCESS;
-    uint32_t irqSave;
     struct GpioGroup *group = NULL;
+    (void)mode;
     unsigned int bitNum = Mp15xToBitNum(gpio);
     
     ret = Mp15xGetGroupByGpioNum(cntlr, gpio, &group);
     if (ret != HDF_SUCCESS) {
         return ret;
     }
+    Mp15xGpioSetDir(cntlr, gpio, GPIO_DIR_IN);
     
-    if (OsalSpinLockIrqSave(&group->lock, &irqSave) != HDF_SUCCESS) {
+    if (OsalSpinLockIrqSave(&group->lock, &group->irqSave) != HDF_SUCCESS) {
         return HDF_ERR_DEVICE_BUSY;
     }
 
     EXTI_ConfigTypeDef EXTI_ConfigStructure;
     EXTI_HandleTypeDef hexti;
-
-
-    Mp15xGpioSetDir(cntlr,gpio,GPIO_DIR_IN);
 
     EXTI_ConfigStructure.Line = EXTI_GPIO | EXTI_EVENT | EXTI_REG1 |bitNum;
     EXTI_ConfigStructure.Trigger = EXTI_TRIGGER_FALLING;
@@ -303,12 +302,12 @@ static int32_t Mp15xGpioSetIrq(struct GpioCntlr *cntlr, uint16_t gpio, uint16_t 
     HAL_EXTI_SetConfigLine(&hexti, &EXTI_ConfigStructure);
     GpioClearIrqUnsafe(group, bitNum);        // clear irq on set
     if (group->irqFunc != NULL) {
-        (void)OsalSpinUnlockIrqRestore(&group->lock, &irqSave);
+        (void)OsalSpinUnlockIrqRestore(&group->lock, &group->irqSave);
         HDF_LOGI("%s: group irq(%p) already registered!", __func__, group->irqFunc);
         return HDF_SUCCESS;
     }
     ret = GpioRegisterGroupIrqUnsafe(bitNum, group);
-    (void)OsalSpinUnlockIrqRestore(&group->lock, &irqSave);
+    (void)OsalSpinUnlockIrqRestore(&group->lock, &group->irqSave);
     HDF_LOGI("%s: group irq(%p) registered!", __func__, group->irqFunc);
     return ret;
 }
@@ -316,6 +315,7 @@ static int32_t Mp15xGpioSetIrq(struct GpioCntlr *cntlr, uint16_t gpio, uint16_t 
 static int32_t Mp15xGpioUnsetIrq(struct GpioCntlr *cntlr, uint16_t gpio)
 {
     int32_t ret = HDF_SUCCESS;
+    (void)gpio;
     struct Mp15xGpioCntlr *gCntlr = NULL;
 
     if (cntlr == NULL || cntlr->priv == NULL) {

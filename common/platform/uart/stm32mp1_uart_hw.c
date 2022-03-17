@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (c) 2022 Nanjing Xiaoxiongpai Intelligent Technology CO., LIMITED.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -63,7 +63,7 @@
 
 static inline uint32_t RegRead(void volatile *base, uint32_t reg)
 {
-	return OSAL_READL((uintptr_t)base + reg);
+    return OSAL_READL((uintptr_t)base + reg);
 }
 
 static inline void RegWrite(void volatile *base, uint32_t reg, uint32_t val)
@@ -87,6 +87,8 @@ void Mp15xUartDump(struct Mp15xUart *uart)
     dprintf("USART_TDR : %#x.\r\n", RegRead(uart->base, USART_TDR));
     dprintf("USART_PRESC : %#x.\r\n", RegRead(uart->base, USART_PRESC));
     dprintf("-------------------------------------\r\n");
+#else
+    (void)uart;
 #endif
 }
 
@@ -175,14 +177,13 @@ int32_t Mp15xUartHwDataBits(struct Mp15xUart *uart, uint32_t bits)
 
     val &= ~USART_CR1_WL_MASK;
 
-    switch (bits)
-    {
-    case UART_HW_DATABIT_8:
-        // val = val;
-        break;
-    default:
-        HDF_LOGE("only support 8b.\r\n");
-        break;
+    switch (bits) {
+        case UART_HW_DATABIT_8:
+            // val = val;
+            break;
+        default:
+            HDF_LOGE("only support 8b.\r\n");
+            break;
     }
 
     RegWrite(uart->base, USART_CR1, val);
@@ -216,21 +217,20 @@ int32_t Mp15xUartHwParity(struct Mp15xUart *uart, uint32_t parity)
 
     val &= ~(USART_CR1_PCE | USART_CR1_PS | USART_CR1_M1 | USART_CR1_M0);
 
-    switch (parity)
-    {
-    case UART_HW_PARITY_NONE:
-        // val = val;
-        break;
+    switch (parity) {
+        case UART_HW_PARITY_NONE:
+            // val = val;
+            break;
 
-    // if enable parity, use 9 bit mode
-    case UART_HW_PARITY_ODD:
-        val |= (USART_CR1_PCE | USART_CR1_PS | USART_CR1_M0);
-        break;
-    case UART_HW_PARITY_EVEN:
-        val |= (USART_CR1_PCE | USART_CR1_M0);
-        break;
-    default:
-        break;
+        // if enable parity, use 9 bit mode
+        case UART_HW_PARITY_ODD:
+            val |= (USART_CR1_PCE | USART_CR1_PS | USART_CR1_M0);
+            break;
+        case UART_HW_PARITY_EVEN:
+            val |= (USART_CR1_PCE | USART_CR1_M0);
+            break;
+        default:
+            break;
     }
 
     RegWrite(uart->base, USART_CR1, val);
@@ -243,7 +243,7 @@ int32_t Mp15xUartHwBaudrate(struct Mp15xUart *uart, uint32_t baudrate)
     uint32_t val;
     uint32_t sorce_rate = uart->clock_rate;
 
-    val = (sorce_rate + baudrate - 1)/baudrate;
+    val = (sorce_rate + baudrate - 1) / baudrate;
     RegWrite(uart->base, USART_BRR, val);
 
     return 0;
@@ -262,7 +262,7 @@ uint32_t Mp15xUartIrqHandler(uint32_t irq, void *data)
     struct Mp15xUart *uart = (struct Mp15xUart *)data;
     struct Mp15xUartRxCtl *rx_ctl = &(uart->rx_ctl);
 
-    if(Mp15xUartHwGetIsr(uart) & USART_ISR_RXNE) {
+    if (Mp15xUartHwGetIsr(uart) & USART_ISR_RXNE) {
         do {
             // read data from RDR
             ch = RegRead(uart->base, USART_RDR);
@@ -274,7 +274,7 @@ uint32_t Mp15xUartIrqHandler(uint32_t irq, void *data)
                 goto end;
             }
 
-        } while((Mp15xUartHwGetIsr(uart) & USART_ISR_RXNE) && (max_count-- > 0));
+        } while ((Mp15xUartHwGetIsr(uart) & USART_ISR_RXNE) && (max_count-- > 0));
 
         if (rx_ctl->stm32mp1_uart_recv_hook)
             rx_ctl->stm32mp1_uart_recv_hook(uart, buf, count);

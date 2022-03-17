@@ -50,6 +50,7 @@ struct GpioGroup {
     unsigned int index; 
     OsalIRQHandle irqFunc;
     OsalSpinlock lock;
+    uint32_t irqSave;
 };
 
 struct Mp15xGpioCntlr {
