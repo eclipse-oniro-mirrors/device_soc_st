@@ -115,6 +115,7 @@ static void Mp15xAdcCalibration(struct Mp15xAdcDevice *stm32mp1)
 
 static inline void Mp15xAdcClkEnable(struct Mp15xAdcDevice *stm32mp1)
 {
+    (void)stm32mp1;
     static bool hasInit = false;
     if (hasInit == true) {
         return;
