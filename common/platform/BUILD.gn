@@ -20,8 +20,11 @@ group("drivers") {
     "i2c",
     "iwdg",
     "uart",
+    "mmc",
+    "rng",
+    "smp",
     "stm32mp1xx_hal",
-    "wlan:wifi_firmware"
+    "wlan:wifi_firmware",
   ]
 }
 
@@ -30,14 +33,13 @@ config("public") {
   ldflags = [ "-Wl,--push-state,--whole-archive" ]
 
     ldflags += [ "-lltdc" ]
-
-  if (defined(LOSCFG_DRIVERS_MMC)) {
+if (defined(LOSCFG_DRIVERS_MMC)) {
     ldflags += [ "-lmmc" ]
   }
-    if (defined(LOSCFG_DRIVERS_HDF_WIFI)) {
+if (defined(LOSCFG_DRIVERS_HDF_WIFI)) {
     ldflags += [ "-lhdf_vendor_wifi" ]
   }
-  if (defined(LOSCFG_DRIVERS_HDF_WIFI) && defined(LOSCFG_DRIVERS_HI3881)) {
+if (defined(LOSCFG_DRIVERS_HDF_WIFI) && defined(LOSCFG_DRIVERS_HI3881)) {
     ldflags += [ "-lhi3881" ]
   }
 }
