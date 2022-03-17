@@ -29,7 +29,7 @@ static int sHalFileGetPath(char *tmpPath, const char* path)
     if(!path || !tmpPath) return -1;
     for(;'.' == path[0]; path++);
     for(;'/' == path[0]; path++);
-    (void)snprintf_s(tmpPath, LITTLEFS_MAX_LFN_LEN, LITTLEFS_MAX_LFN_LEN, "talkweb/%s", path);
+    (void)snprintf_s(tmpPath, LITTLEFS_MAX_LFN_LEN, LITTLEFS_MAX_LFN_LEN, "/talkweb/%s", path);
     return 0;
 }
 
