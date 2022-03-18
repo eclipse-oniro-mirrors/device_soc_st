@@ -27,6 +27,8 @@ LOCAL_SRCS += STM32MP1xx_HAL_Driver/Src/system_stm32mp1xx.c \
 			  STM32MP1xx_HAL_Driver/Src/stm32mp1xx_hal_rcc.c \
 			  STM32MP1xx_HAL_Driver/Src/stm32mp1xx_hal_rcc_ex.c \
 			  STM32MP1xx_HAL_Driver/Src/stm32mp1xx_hal_rng.c \
+                          STM32MP1xx_HAL_Driver/Src/stm32mp1xx_hal_tim.c \
+			  STM32MP1xx_HAL_Driver/Src/stm32mp1xx_hal_tim_ex.c \
 
 LOCAL_INCLUDE += -I STM32MP1xx_HAL_Driver/Inc
 

@@ -2,6 +2,7 @@
 #include "adc/adc_config.hcs"
 #include "gpio/gpio_config.hcs"
 #include "i2c/i2c_config.hcs"
+#include "pwm/pwm_config.hcs"
 #include "uart/uart_config.hcs"
 #include "watchdog/watchdog_config.hcs"
 #include "mmc/mmc_config.hcs"
