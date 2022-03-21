@@ -1,0 +1,23 @@
+root {
+  platform {
+    pwm_config {
+      template pwm_device {                  
+        serviceName = "";
+        match_attr = "";
+        num = 0;                              
+        base = 0x12070000;                    
+      }
+      device_0x40001000 :: pwm_device {
+        match_attr = "st_stm32mp1_pwm_0";
+        num = 3;
+        base = 0x40001000;      
+
+        /* [port,pin]
+            <port> 0:GPIOA 1:GPIOB 3:GPIOC ......
+            <pin>  0:PIN0 1:PIN1 2:PIN2 ......
+        */                    
+        pwmIomux = [1, 0];   //PB0          
+      }
+    }
+  }
+}

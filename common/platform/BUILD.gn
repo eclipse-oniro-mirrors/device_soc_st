@@ -21,6 +21,7 @@ group("drivers") {
     "i2c",
     "iwdg",
     "uart",
+    "pwm",
     "rng",
     "smp",
     "stm32mp1xx_hal",
