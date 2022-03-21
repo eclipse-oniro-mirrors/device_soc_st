@@ -60,14 +60,14 @@ struct Stm32mp1PwmRegs {
     volatile uint32_t BDTR;        /*!< TIM break and dead-time register,         Address offset: 0x44 */
     volatile uint32_t DCR;         /*!< TIM DMA control register,                 Address offset: 0x48 */
     volatile uint32_t DMAR;        /*!< TIM DMA address for full transfer,        Address offset: 0x4C */
-    uint32_t      RESERVED0;   /*!< Reserved,                                 Address offset: 0x50 */
+    uint32_t      RESERVED0;       /*!< Reserved,                                 Address offset: 0x50 */
     volatile uint32_t CCMR3;       /*!< TIM capture/compare mode register 3,      Address offset: 0x54 */
     volatile uint32_t CCR5;        /*!< TIM capture/compare register5,            Address offset: 0x58 */
     volatile uint32_t CCR6;        /*!< TIM capture/compare register6,            Address offset: 0x5C */
     volatile uint32_t AF1;         /*!< TIM alternate function option register 1, Address offset: 0x60 */
     volatile uint32_t AF2;         /*!< TIM alternate function option register 2, Address offset: 0x64 */
     volatile uint32_t TISEL;       /*!< TIM Input Selection register,             Address offset: 0x68 */
-    uint32_t  RESERVED1[226];  /*!< Reserved,                                 Address offset: 0x6C-0x3F0 */
+    uint32_t  RESERVED1[226];      /*!< Reserved,                                 Address offset: 0x6C-0x3F0 */
     volatile uint32_t VERR;        /*!< TIM version register,                     Address offset: 0x3F4 */
     volatile uint32_t IPIDR;       /*!< TIM Identification register,              Address offset: 0x3F8 */
     volatile uint32_t SIDR;        /*!< TIM Size Identification register,         Address offset: 0x3FC */

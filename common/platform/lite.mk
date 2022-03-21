@@ -40,6 +40,11 @@ ifeq ($(LOSCFG_DRIVERS_HDF_PLATFORM_WATCHDOG), y)
     LIB_SUBDIRS    += $(ST_DRIVERS_ROOT)/iwdg
 endif
 
+ifeq ($(LOSCFG_DRIVERS_HDF_PLATFORM_PWM), y)
+    LITEOS_BASELIB += -lhdf_pwm
+    LIB_SUBDIRS    += $(ST_DRIVERS_ROOT)/pwm
+endif
+
 ifeq ($(LOSCFG_DRIVERS_HDF_PLATFORM_UART), y)
     LITEOS_BASELIB += -lhdf_uart
     LIB_SUBDIRS    += $(ST_DRIVERS_ROOT)/uart
