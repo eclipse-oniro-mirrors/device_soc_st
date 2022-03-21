@@ -1,5 +1,5 @@
 /* 
- * Copyright (c) 2021 Nanjing Xiaoxiongpai Intelligent Technology CO., LIMITED.
+ * Copyright (c) 2021 Nanjing Xiaoxiongpai Intelligent Technology Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -22,7 +22,7 @@
 
 #include "securec.h"
 
-#define HDF_LOG_TAG Mp15xIwdg
+#define HDF_LOG_TAG Mp1xxIwdg
 
 #define BITS_PER_LONG 32
 
@@ -110,7 +110,7 @@ unsigned long roundup_pow_of_two(unsigned long n)
 	return 1UL << generic_fls(n - 1);
 }
 
-struct Mp15xIwdg {
+struct Mp1xxIwdg {
     struct WatchdogCntlr wdt;   // 控制器
 
     uint32_t num;               // 当前独立看门狗编号
@@ -145,7 +145,7 @@ static inline void reg_write(void volatile *base, uint32_t reg, uint32_t val)
 }
 
 // TODO : get clock source real rate
-static inline int32_t Mp15xIwdgGetClockRate(struct Mp15xIwdg *iwdg)
+static inline int32_t Mp1xxIwdgGetClockRate(struct Mp1xxIwdg *iwdg)
 {
     int ret = HDF_SUCCESS;
 
@@ -162,21 +162,21 @@ static inline int32_t Mp15xIwdgGetClockRate(struct Mp15xIwdg *iwdg)
     return ret;
 }
 
-static inline uint32_t Mp15xIwdgGetSr(struct Mp15xIwdg *iwdg)
+static inline uint32_t Mp1xxIwdgGetSr(struct Mp1xxIwdg *iwdg)
 {
     return reg_read(iwdg->base, IWDG_SR);
 }
 
-int32_t Mp15xIwdgStart(struct WatchdogCntlr *wdt)
+int32_t Mp1xxIwdgStart(struct WatchdogCntlr *wdt)
 {
-    struct Mp15xIwdg *iwdg = NULL;
+    struct Mp1xxIwdg *iwdg = NULL;
     uint32_t tout, presc, iwdg_pr, iwdg_rlr, iwdg_sr;
     uint32_t i = 10;
 
     if (wdt == NULL) {
         return HDF_ERR_INVALID_OBJECT;
     }
-    iwdg = (struct Mp15xIwdg *)wdt->priv;
+    iwdg = (struct Mp1xxIwdg *)wdt->priv;
 
     // 计算装载值
     tout = iwdg->seconds;// 超时秒数
@@ -205,7 +205,7 @@ int32_t Mp15xIwdgStart(struct WatchdogCntlr *wdt)
 	reg_write(iwdg->base, IWDG_KR, KR_KEY_ENABLE);
 
     // 等待状态寄存器 SR_PVU | SR_RVU 复位
-    while ((iwdg_sr = Mp15xIwdgGetSr(iwdg)) & (SR_PVU | SR_RVU))
+    while ((iwdg_sr = Mp1xxIwdgGetSr(iwdg)) & (SR_PVU | SR_RVU))
     {
         OsalMDelay(10);
         if(!(--i)) {
@@ -223,46 +223,46 @@ int32_t Mp15xIwdgStart(struct WatchdogCntlr *wdt)
     return HDF_SUCCESS;
 }
 
-int32_t Mp15xIwdgSetTimeout(struct WatchdogCntlr *wdt, uint32_t seconds)
+int32_t Mp1xxIwdgSetTimeout(struct WatchdogCntlr *wdt, uint32_t seconds)
 {
-    struct Mp15xIwdg *iwdg = NULL;
+    struct Mp1xxIwdg *iwdg = NULL;
 
     if (wdt == NULL) {
         return HDF_ERR_INVALID_OBJECT;
     }
 
-    iwdg = (struct Mp15xIwdg *)wdt->priv;
+    iwdg = (struct Mp1xxIwdg *)wdt->priv;
     iwdg->seconds = seconds;
 
     // 如果iwdg已经是启动状态, 需要重新装载超时值并继续喂狗操作
     if (iwdg->start) {
-        return Mp15xIwdgStart(wdt);
+        return Mp1xxIwdgStart(wdt);
     }
 
     return HDF_SUCCESS;
 }
 
-int32_t Mp15xIwdgGetTimeout(struct WatchdogCntlr *wdt, uint32_t *seconds)
+int32_t Mp1xxIwdgGetTimeout(struct WatchdogCntlr *wdt, uint32_t *seconds)
 {
-    struct Mp15xIwdg *iwdg = NULL;
+    struct Mp1xxIwdg *iwdg = NULL;
     if (wdt == NULL || seconds == NULL) {
         return HDF_ERR_INVALID_OBJECT;
     }
-    iwdg = (struct Mp15xIwdg *)wdt->priv;
+    iwdg = (struct Mp1xxIwdg *)wdt->priv;
 
     *seconds = iwdg->seconds;
     
     return HDF_SUCCESS;
 }
 
-static int32_t Mp15xIwdgFeed(struct WatchdogCntlr *wdt)
+static int32_t Mp1xxIwdgFeed(struct WatchdogCntlr *wdt)
 {
-    struct Mp15xIwdg *iwdg = NULL;
+    struct Mp1xxIwdg *iwdg = NULL;
 
     if (wdt == NULL) {
         return HDF_ERR_INVALID_OBJECT;
     }
-    iwdg = (struct Mp15xIwdg *)wdt->priv;
+    iwdg = (struct Mp1xxIwdg *)wdt->priv;
 
     /* reload watchdog */
     reg_write(iwdg->base, IWDG_KR, KR_KEY_RELOAD);
@@ -270,16 +270,16 @@ static int32_t Mp15xIwdgFeed(struct WatchdogCntlr *wdt)
     return HDF_SUCCESS;
 }
 
-static int32_t Mp15xIwdgGetStatus(struct WatchdogCntlr *wdt, int32_t *status)
+static int32_t Mp1xxIwdgGetStatus(struct WatchdogCntlr *wdt, int32_t *status)
 {
     (void)status;
     int32_t ret = WATCHDOG_STOP;
-    struct Mp15xIwdg *iwdg = NULL;
+    struct Mp1xxIwdg *iwdg = NULL;
 
     if (wdt == NULL) {
         return HDF_ERR_INVALID_OBJECT;
     }
-    iwdg = (struct Mp15xIwdg *)wdt->priv;
+    iwdg = (struct Mp1xxIwdg *)wdt->priv;
 
     if (iwdg->start) {
         ret = WATCHDOG_START;
@@ -288,20 +288,20 @@ static int32_t Mp15xIwdgGetStatus(struct WatchdogCntlr *wdt, int32_t *status)
 }
 
 /* WatchdogOpen 的时候被调用 */
-static int32_t Mp15xIwdgGetPriv(struct WatchdogCntlr *wdt)
+static int32_t Mp1xxIwdgGetPriv(struct WatchdogCntlr *wdt)
 {
     int32_t ret;
-    struct Mp15xIwdg *iwdg = NULL;
+    struct Mp1xxIwdg *iwdg = NULL;
 
     if (wdt == NULL) {
         return HDF_ERR_INVALID_OBJECT;
     }
-    iwdg = (struct Mp15xIwdg *)wdt->priv;
+    iwdg = (struct Mp1xxIwdg *)wdt->priv;
 
     // 获取当前时钟源频率
-    ret = Mp15xIwdgGetClockRate(iwdg);
+    ret = Mp1xxIwdgGetClockRate(iwdg);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("Mp15xIwdgGetClockRate fail, ret : %#x.", ret);
+        HDF_LOGE("Mp1xxIwdgGetClockRate fail, ret : %#x.", ret);
         return HDF_FAILURE;
     }
 
@@ -313,34 +313,34 @@ static int32_t Mp15xIwdgGetPriv(struct WatchdogCntlr *wdt)
 }
 
 /* WatchdogClose 的时候被调用 */
-static void Mp15xIwdgReleasePriv(struct WatchdogCntlr *wdt)
+static void Mp1xxIwdgReleasePriv(struct WatchdogCntlr *wdt)
 {
     (void)wdt;
 }
 
 static struct WatchdogMethod g_stm32mp1_iwdg_ops = {
-    .feed = Mp15xIwdgFeed,
-    .getPriv = Mp15xIwdgGetPriv,
-    .getStatus = Mp15xIwdgGetStatus,
-    .getTimeout = Mp15xIwdgGetTimeout,
-    .releasePriv = Mp15xIwdgReleasePriv,
-    .setTimeout = Mp15xIwdgSetTimeout,
-    .start = Mp15xIwdgStart,
+    .feed = Mp1xxIwdgFeed,
+    .getPriv = Mp1xxIwdgGetPriv,
+    .getStatus = Mp1xxIwdgGetStatus,
+    .getTimeout = Mp1xxIwdgGetTimeout,
+    .releasePriv = Mp1xxIwdgReleasePriv,
+    .setTimeout = Mp1xxIwdgSetTimeout,
+    .start = Mp1xxIwdgStart,
 
 // stm32mp1的iwdg不支持软件停止
     .stop = NULL
 };
 
-static int Mp15xIwdgFeedTaskFunc(void *arg)
+static int Mp1xxIwdgFeedTaskFunc(void *arg)
 {
     // auto feed dog task
     struct WatchdogCntlr *wdt = (struct WatchdogCntlr *)arg;
-    struct Mp15xIwdg *iwdg = (struct Mp15xIwdg *)wdt->priv;
+    struct Mp1xxIwdg *iwdg = (struct Mp1xxIwdg *)wdt->priv;
 
     while (1)
     {
         if (iwdg->start) {
-            Mp15xIwdgFeed(wdt);
+            Mp1xxIwdgFeed(wdt);
         }
         OsalSleep(iwdg->auto_feed_period);
     }
@@ -349,16 +349,16 @@ static int Mp15xIwdgFeedTaskFunc(void *arg)
 }
 
 // create timer for auto feed
-static int32_t Mp15xIwdgCreateFeedDogTask(struct WatchdogCntlr *wdt)
+static int32_t Mp1xxIwdgCreateFeedDogTask(struct WatchdogCntlr *wdt)
 {
 #define TASK_NAME_SIZE  (16)
     int32_t ret;
-    struct Mp15xIwdg *iwdg = (struct Mp15xIwdg *)wdt->priv;
+    struct Mp1xxIwdg *iwdg = (struct Mp1xxIwdg *)wdt->priv;
     struct OsalThreadParam param = {0};
     char task_name[TASK_NAME_SIZE] = {0};
 
     // create thread
-    ret = OsalThreadCreate(&(iwdg->feed_dog_thread), (OsalThreadEntry)Mp15xIwdgFeedTaskFunc, (void *)wdt);
+    ret = OsalThreadCreate(&(iwdg->feed_dog_thread), (OsalThreadEntry)Mp1xxIwdgFeedTaskFunc, (void *)wdt);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("OsalThreadCreate fail, ret : %#x.\r\n", ret);
         return HDF_FAILURE;
@@ -374,7 +374,7 @@ static int32_t Mp15xIwdgCreateFeedDogTask(struct WatchdogCntlr *wdt)
     return OsalThreadStart(&(iwdg->feed_dog_thread), &param);
 }
 
-static int32_t Mp15xIwdgReadDrs(struct Mp15xIwdg *iwdg, const struct DeviceResourceNode *node)
+static int32_t Mp1xxIwdgReadDrs(struct Mp1xxIwdg *iwdg, const struct DeviceResourceNode *node)
 {
     int32_t ret;
     struct DeviceResourceIface *drsOps = NULL;
@@ -435,10 +435,10 @@ static int32_t Mp15xIwdgReadDrs(struct Mp15xIwdg *iwdg, const struct DeviceResou
     return HDF_SUCCESS;
 }
 
-static int32_t Mp15xIwdgBind(struct HdfDeviceObject *device)
+static int32_t Mp1xxIwdgBind(struct HdfDeviceObject *device)
 {
     int32_t ret;
-    struct Mp15xIwdg *iwdg = NULL;
+    struct Mp1xxIwdg *iwdg = NULL;
 
     if (device == NULL || device->property == NULL) {
         HDF_LOGE("%s: device or property is null!", __func__);
@@ -446,14 +446,14 @@ static int32_t Mp15xIwdgBind(struct HdfDeviceObject *device)
     }
 
     // 申请内存空间
-    iwdg = (struct Mp15xIwdg *)OsalMemCalloc(sizeof(struct Mp15xIwdg));
+    iwdg = (struct Mp1xxIwdg *)OsalMemCalloc(sizeof(struct Mp1xxIwdg));
     if (iwdg == NULL) {
         HDF_LOGE("%s: malloc iwdg fail!", __func__);
         return HDF_ERR_MALLOC_FAIL;
     }
 
     // 解析配置
-    ret = Mp15xIwdgReadDrs(iwdg, device->property);
+    ret = Mp1xxIwdgReadDrs(iwdg, device->property);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%s: read drs fail:%d", __func__, ret);
         OsalMemFree(iwdg);
@@ -486,48 +486,48 @@ static int32_t Mp15xIwdgBind(struct HdfDeviceObject *device)
     return HDF_SUCCESS;
 }
 
-static int32_t Mp15xIwdgInit(struct HdfDeviceObject *device)
+static int32_t Mp1xxIwdgInit(struct HdfDeviceObject *device)
 {
     int32_t ret;
     struct WatchdogCntlr *wdt = NULL;
-    struct Mp15xIwdg *iwdg = NULL;
+    struct Mp1xxIwdg *iwdg = NULL;
 
     // get WatchdogCntlr
     wdt = WatchdogCntlrFromDevice(device);
     if (wdt == NULL) {
         return HDF_FAILURE;
     }
-    iwdg = (struct Mp15xIwdg *)wdt->priv;
+    iwdg = (struct Mp1xxIwdg *)wdt->priv;
 
     // get priv data(get clock source)
-    ret = Mp15xIwdgGetPriv(wdt);
+    ret = Mp1xxIwdgGetPriv(wdt);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("Mp15xIwdgGetPriv fail.");
+        HDF_LOGE("Mp1xxIwdgGetPriv fail.");
         return HDF_FAILURE;
     }
 
     // set default timeout
-    ret = Mp15xIwdgSetTimeout(wdt, iwdg->seconds);
+    ret = Mp1xxIwdgSetTimeout(wdt, iwdg->seconds);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("Mp15xIwdgSetTimeout fail.");
+        HDF_LOGE("Mp1xxIwdgSetTimeout fail.");
         return HDF_FAILURE;
     }
 
     // if need aotu feed, create a task
     if (iwdg->auto_feed) {
-        ret = Mp15xIwdgCreateFeedDogTask(wdt);
+        ret = Mp1xxIwdgCreateFeedDogTask(wdt);
         if (ret != HDF_SUCCESS) {
-            HDF_LOGE("Mp15xIwdgCreateFeedDogTask fail, ret : %#x.", ret);
+            HDF_LOGE("Mp1xxIwdgCreateFeedDogTask fail, ret : %#x.", ret);
         }
     }
 
     return HDF_SUCCESS;
 }
 
-static void Mp15xIwdgRelease(struct HdfDeviceObject *device)
+static void Mp1xxIwdgRelease(struct HdfDeviceObject *device)
 {
     struct WatchdogCntlr *wdt = NULL;
-    struct Mp15xIwdg *iwdg = NULL;
+    struct Mp1xxIwdg *iwdg = NULL;
 
     if (device == NULL) {
         return;
@@ -539,7 +539,7 @@ static void Mp15xIwdgRelease(struct HdfDeviceObject *device)
     }
     WatchdogCntlrRemove(wdt);
 
-    iwdg = (struct Mp15xIwdg *)wdt->priv;
+    iwdg = (struct Mp1xxIwdg *)wdt->priv;
     if (iwdg->base != NULL) {
         OsalIoUnmap((void *)iwdg->base);
         iwdg->base = NULL;
@@ -549,9 +549,9 @@ static void Mp15xIwdgRelease(struct HdfDeviceObject *device)
 
 struct HdfDriverEntry g_hdf_driver_iwdg_entry = {
     .moduleVersion = 1,
-    .Bind = Mp15xIwdgBind,
-    .Init = Mp15xIwdgInit,
-    .Release = Mp15xIwdgRelease,
+    .Bind = Mp1xxIwdgBind,
+    .Init = Mp1xxIwdgInit,
+    .Release = Mp1xxIwdgRelease,
     .moduleName = "stm32mp1_iwdg",
 };
 HDF_INIT(g_hdf_driver_iwdg_entry);

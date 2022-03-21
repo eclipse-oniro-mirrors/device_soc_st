@@ -1,5 +1,5 @@
 /* 
- * Copyright (c) 2021 Nanjing Xiaoxiongpai Intelligent Technology CO., LIMITED.
+ * Copyright (c) 2021 Nanjing Xiaoxiongpai Intelligent Technology Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,35 +16,35 @@
 #include "stm32mp1_gpio.h"
 
 
-static inline struct Mp15xGpioCntlr *ToMp15xGpioCntlr(struct GpioCntlr *cntlr)
+static inline struct Mp1xxGpioCntlr *ToMp1xxGpioCntlr(struct GpioCntlr *cntlr)
 {
-    return (struct Mp15xGpioCntlr *)cntlr;
+    return (struct Mp1xxGpioCntlr *)cntlr;
 }
 
-static inline uint16_t Mp15xToGroupNum(uint16_t gpio)
+static inline uint16_t Mp1xxToGroupNum(uint16_t gpio)
 {
-    return (uint16_t)(gpio / g_Mp15xGpioCntlr.bitNum);
+    return (uint16_t)(gpio / g_Mp1xxGpioCntlr.bitNum);
 }
 
-static inline uint16_t Mp15xToBitNum(uint16_t gpio)
+static inline uint16_t Mp1xxToBitNum(uint16_t gpio)
 {
-    return (uint16_t)(gpio % g_Mp15xGpioCntlr.bitNum);
+    return (uint16_t)(gpio % g_Mp1xxGpioCntlr.bitNum);
 }
-static inline uint16_t Mp15xToGpioNum(uint16_t group, uint16_t bit)
+static inline uint16_t Mp1xxToGpioNum(uint16_t group, uint16_t bit)
 {
-    return (uint16_t)(group * g_Mp15xGpioCntlr.bitNum + bit);
+    return (uint16_t)(group * g_Mp1xxGpioCntlr.bitNum + bit);
 }
 
-static int32_t Mp15xGetGroupByGpioNum(struct GpioCntlr *cntlr, uint16_t gpio, struct GpioGroup **group)
+static int32_t Mp1xxGetGroupByGpioNum(struct GpioCntlr *cntlr, uint16_t gpio, struct GpioGroup **group)
 {
-    struct Mp15xGpioCntlr *stm32gpio = NULL;
-    uint16_t groupIndex = Mp15xToGroupNum(gpio);
+    struct Mp1xxGpioCntlr *stm32gpio = NULL;
+    uint16_t groupIndex = Mp1xxToGroupNum(gpio);
 
     if (cntlr == NULL || cntlr->priv == NULL) {
         HDF_LOGE("%s: cntlr or priv is NULL", __func__);
         return HDF_ERR_INVALID_OBJECT;
     }
-    stm32gpio = ToMp15xGpioCntlr(cntlr);
+    stm32gpio = ToMp1xxGpioCntlr(cntlr);
     if (groupIndex >= stm32gpio->groupNum) {
         HDF_LOGE("%s: err group index:%u", __func__, groupIndex);
         return HDF_ERR_INVALID_PARAM;
@@ -54,19 +54,19 @@ static int32_t Mp15xGetGroupByGpioNum(struct GpioCntlr *cntlr, uint16_t gpio, st
 }
 
 
-static int32_t Mp15xGpioSetDir(struct GpioCntlr *cntlr, uint16_t gpio, uint16_t dir)
+static int32_t Mp1xxGpioSetDir(struct GpioCntlr *cntlr, uint16_t gpio, uint16_t dir)
 {
     int32_t ret;
     
     unsigned int val;
     volatile unsigned char *addr = NULL;
 
-    unsigned int bitNum = Mp15xToBitNum(gpio);
+    unsigned int bitNum = Mp1xxToBitNum(gpio);
     struct GpioGroup *group = NULL;
 
-    ret = Mp15xGetGroupByGpioNum(cntlr, gpio, &group);
+    ret = Mp1xxGetGroupByGpioNum(cntlr, gpio, &group);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("Mp15xGetGroupByGpioNum failed\n");
+        HDF_LOGE("Mp1xxGetGroupByGpioNum failed\n");
         return ret;
     }
 
@@ -74,7 +74,7 @@ static int32_t Mp15xGpioSetDir(struct GpioCntlr *cntlr, uint16_t gpio, uint16_t 
         HDF_LOGE("OsalSpinLockIrqSave failed\n");
         return HDF_ERR_DEVICE_BUSY;
     }
-    addr = STM32MP15X_GPIO_MODER(group->regBase);
+    addr = STM32MP1XX_GPIO_MODER(group->regBase);
     val = OSAL_READL(addr);
     if (dir == GPIO_DIR_IN) {
         val &= ~(0X3 << (bitNum*2)); /* bit0:1 清零 */
@@ -86,20 +86,20 @@ static int32_t Mp15xGpioSetDir(struct GpioCntlr *cntlr, uint16_t gpio, uint16_t 
     (void)OsalSpinUnlockIrqRestore(&group->lock, &group->irqSave);
     return HDF_SUCCESS;
 }
-static int32_t Mp15xGpioGetDir(struct GpioCntlr *cntlr, uint16_t gpio, uint16_t *dir)
+static int32_t Mp1xxGpioGetDir(struct GpioCntlr *cntlr, uint16_t gpio, uint16_t *dir)
 {
     int32_t ret;
     unsigned int val;
     volatile unsigned char *addr = NULL;
-    unsigned int bitNum = Mp15xToBitNum(gpio);
+    unsigned int bitNum = Mp1xxToBitNum(gpio);
     struct GpioGroup *group = NULL;
 
-    ret = Mp15xGetGroupByGpioNum(cntlr, gpio, &group);
+    ret = Mp1xxGetGroupByGpioNum(cntlr, gpio, &group);
     if (ret != HDF_SUCCESS) {
         return ret;
     }
 
-    addr = STM32MP15X_GPIO_MODER(group->regBase);
+    addr = STM32MP1XX_GPIO_MODER(group->regBase);
     val = OSAL_READL(addr);
     if (val & (1 << (bitNum*2))) {
         *dir = GPIO_DIR_OUT;
@@ -108,23 +108,23 @@ static int32_t Mp15xGpioGetDir(struct GpioCntlr *cntlr, uint16_t gpio, uint16_t 
     }
     return HDF_SUCCESS;
 }
-static int32_t Mp15xGpioWrite(struct GpioCntlr *cntlr, uint16_t gpio, uint16_t val)
+static int32_t Mp1xxGpioWrite(struct GpioCntlr *cntlr, uint16_t gpio, uint16_t val)
 {
     int32_t ret;
     
     unsigned int valCur;
-    unsigned int bitNum = Mp15xToBitNum(gpio);
+    unsigned int bitNum = Mp1xxToBitNum(gpio);
     volatile unsigned char *addr = NULL;
     struct GpioGroup *group = NULL;
 
-    ret = Mp15xGetGroupByGpioNum(cntlr, gpio, &group);
+    ret = Mp1xxGetGroupByGpioNum(cntlr, gpio, &group);
     if (ret != HDF_SUCCESS) {
         return ret;
     }
     if (OsalSpinLockIrqSave(&group->lock, &group->irqSave) != HDF_SUCCESS) {
         return HDF_ERR_DEVICE_BUSY;
     }
-    addr = STM32MP15X_GPIO_BSRR(group->regBase);
+    addr = STM32MP1XX_GPIO_BSRR(group->regBase);
     valCur = OSAL_READL(addr);
     if (val == GPIO_VAL_LOW) {
         valCur &= ~(0x1 << bitNum);
@@ -138,20 +138,20 @@ static int32_t Mp15xGpioWrite(struct GpioCntlr *cntlr, uint16_t gpio, uint16_t v
     return HDF_SUCCESS;
 }
 
-static int32_t Mp15xGpioRead(struct GpioCntlr *cntlr, uint16_t gpio, uint16_t *val)
+static int32_t Mp1xxGpioRead(struct GpioCntlr *cntlr, uint16_t gpio, uint16_t *val)
 {
     int32_t ret;
     unsigned int valCur;
     volatile unsigned char *addr = NULL;
-    unsigned int bitNum = Mp15xToBitNum(gpio);
+    unsigned int bitNum = Mp1xxToBitNum(gpio);
     struct GpioGroup *group = NULL;
 
-    ret = Mp15xGetGroupByGpioNum(cntlr, gpio, &group);
+    ret = Mp1xxGetGroupByGpioNum(cntlr, gpio, &group);
     if (ret != HDF_SUCCESS) {
         return ret;
     }
 
-    addr = STM32MP15X_GPIO_IDR(group->regBase);
+    addr = STM32MP1XX_GPIO_IDR(group->regBase);
     valCur = OSAL_READL(addr);
     if (valCur & (1 << bitNum)) {
         *val = GPIO_VAL_HIGH;   
@@ -171,11 +171,11 @@ static uint32_t IrqHandleNoShare(uint32_t irq, void *data)
         HDF_LOGW("%s: data is NULL!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    for (i = 0; i < g_Mp15xGpioCntlr.bitNum; i++) {
+    for (i = 0; i < g_Mp1xxGpioCntlr.bitNum; i++) {
         if(__HAL_GPIO_EXTI_GET_IT(1<<i,group->exitBase) != 0)
         {
             __HAL_GPIO_EXTI_CLEAR_IT(1<<i,group->exitBase);
-            GpioCntlrIrqCallback(&g_Mp15xGpioCntlr.cntlr, Mp15xToGpioNum(group->index, i));
+            GpioCntlrIrqCallback(&g_Mp1xxGpioCntlr.cntlr, Mp1xxToGpioNum(group->index, i));
         }
     }
     return HDF_SUCCESS;
@@ -274,18 +274,18 @@ static void GpioClearIrqUnsafe(struct GpioGroup *group, uint16_t bitNum)
 {
     __HAL_GPIO_EXTI_CLEAR_IT(bitNum,group->exitBase);
 }
-static int32_t Mp15xGpioSetIrq(struct GpioCntlr *cntlr, uint16_t gpio, uint16_t mode)
+static int32_t Mp1xxGpioSetIrq(struct GpioCntlr *cntlr, uint16_t gpio, uint16_t mode)
 {
     int32_t ret = HDF_SUCCESS;
     struct GpioGroup *group = NULL;
     (void)mode;
-    unsigned int bitNum = Mp15xToBitNum(gpio);
+    unsigned int bitNum = Mp1xxToBitNum(gpio);
     
-    ret = Mp15xGetGroupByGpioNum(cntlr, gpio, &group);
+    ret = Mp1xxGetGroupByGpioNum(cntlr, gpio, &group);
     if (ret != HDF_SUCCESS) {
         return ret;
     }
-    Mp15xGpioSetDir(cntlr, gpio, GPIO_DIR_IN);
+    Mp1xxGpioSetDir(cntlr, gpio, GPIO_DIR_IN);
     
     if (OsalSpinLockIrqSave(&group->lock, &group->irqSave) != HDF_SUCCESS) {
         return HDF_ERR_DEVICE_BUSY;
@@ -296,7 +296,7 @@ static int32_t Mp15xGpioSetIrq(struct GpioCntlr *cntlr, uint16_t gpio, uint16_t 
 
     EXTI_ConfigStructure.Line = EXTI_GPIO | EXTI_EVENT | EXTI_REG1 |bitNum;
     EXTI_ConfigStructure.Trigger = EXTI_TRIGGER_FALLING;
-    EXTI_ConfigStructure.GPIOSel = Mp15xToGroupNum(gpio);
+    EXTI_ConfigStructure.GPIOSel = Mp1xxToGroupNum(gpio);
     EXTI_ConfigStructure.Mode = EXTI_MODE_C1_INTERRUPT;
 
     HAL_EXTI_SetConfigLine(&hexti, &EXTI_ConfigStructure);
@@ -312,29 +312,29 @@ static int32_t Mp15xGpioSetIrq(struct GpioCntlr *cntlr, uint16_t gpio, uint16_t 
     return ret;
 }
 
-static int32_t Mp15xGpioUnsetIrq(struct GpioCntlr *cntlr, uint16_t gpio)
+static int32_t Mp1xxGpioUnsetIrq(struct GpioCntlr *cntlr, uint16_t gpio)
 {
     int32_t ret = HDF_SUCCESS;
     (void)gpio;
-    struct Mp15xGpioCntlr *gCntlr = NULL;
+    struct Mp1xxGpioCntlr *gCntlr = NULL;
 
     if (cntlr == NULL || cntlr->priv == NULL) {
         HDF_LOGE("%s: GpioCntlr or cntlr.priv null!", __func__);
         return HDF_ERR_INVALID_OBJECT;
     }
 
-    gCntlr = (struct Mp15xGpioCntlr *)cntlr->priv;
+    gCntlr = (struct Mp1xxGpioCntlr *)cntlr->priv;
 
 
     return ret;
 }
 
-static int32_t Mp15xGpioEnableIrq(struct GpioCntlr *cntlr, uint16_t gpio)
+static int32_t Mp1xxGpioEnableIrq(struct GpioCntlr *cntlr, uint16_t gpio)
 {
     int32_t ret = HDF_SUCCESS;
-    struct Mp15xGpioCntlr *gCntlr = NULL;
+    struct Mp1xxGpioCntlr *gCntlr = NULL;
     struct GpioGroup *group = NULL;
-    unsigned int bitNum = Mp15xToBitNum(gpio);
+    unsigned int bitNum = Mp1xxToBitNum(gpio);
 
     if (cntlr == NULL || cntlr->priv == NULL) {
         HDF_LOGE("%s: GpioCntlr or cntlr.priv null!", __func__);
@@ -342,29 +342,29 @@ static int32_t Mp15xGpioEnableIrq(struct GpioCntlr *cntlr, uint16_t gpio)
     }
 
 
-    ret = Mp15xGetGroupByGpioNum(cntlr, gpio, &group);
+    ret = Mp1xxGetGroupByGpioNum(cntlr, gpio, &group);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("Mp15xGetGroupByGpioNum failed\n");
+        HDF_LOGE("Mp1xxGetGroupByGpioNum failed\n");
         return ret;
     }
 
     EXTI_ConfigTypeDef EXTI_ConfigStructure;
     EXTI_HandleTypeDef hexti;
 
-    Mp15xGpioSetDir(cntlr,gpio,GPIO_DIR_IN);
+    Mp1xxGpioSetDir(cntlr,gpio,GPIO_DIR_IN);
     
     EXTI_ConfigStructure.Line = EXTI_GPIO | EXTI_EVENT | EXTI_REG1 |bitNum;
     EXTI_ConfigStructure.Trigger = EXTI_TRIGGER_FALLING;
-    EXTI_ConfigStructure.GPIOSel = Mp15xToGroupNum(gpio);
+    EXTI_ConfigStructure.GPIOSel = Mp1xxToGroupNum(gpio);
     EXTI_ConfigStructure.Mode = EXTI_MODE_C1_INTERRUPT;
     
     HAL_EXTI_SetConfigLine(&hexti, &EXTI_ConfigStructure);
-    gCntlr = (struct Mp15xGpioCntlr *)cntlr->priv;
+    gCntlr = (struct Mp1xxGpioCntlr *)cntlr->priv;
 
     return ret;
 }
 
-static int32_t Mp15xGpioDisableIrq(struct GpioCntlr *cntlr, uint16_t gpio)
+static int32_t Mp1xxGpioDisableIrq(struct GpioCntlr *cntlr, uint16_t gpio)
 {
     int32_t ret = HDF_SUCCESS;
 
@@ -375,9 +375,9 @@ static int32_t Mp15xGpioDisableIrq(struct GpioCntlr *cntlr, uint16_t gpio)
     }
     struct GpioGroup *group = NULL;
 
-    ret = Mp15xGetGroupByGpioNum(cntlr, gpio, &group);
+    ret = Mp1xxGetGroupByGpioNum(cntlr, gpio, &group);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("Mp15xGetGroupByGpioNum failed\n");
+        HDF_LOGE("Mp1xxGetGroupByGpioNum failed\n");
         return ret;
     }
 
@@ -390,18 +390,18 @@ static int32_t Mp15xGpioDisableIrq(struct GpioCntlr *cntlr, uint16_t gpio)
 struct GpioMethod g_GpioMethod = {
     .request = NULL,
     .release = NULL,
-    .write = Mp15xGpioWrite,
-    .read = Mp15xGpioRead,
-    .setDir = Mp15xGpioSetDir,
-    .getDir = Mp15xGpioGetDir,
+    .write = Mp1xxGpioWrite,
+    .read = Mp1xxGpioRead,
+    .setDir = Mp1xxGpioSetDir,
+    .getDir = Mp1xxGpioGetDir,
     .toIrq = NULL,
-    .setIrq = Mp15xGpioSetIrq,
-    .unsetIrq = Mp15xGpioUnsetIrq,
-    .enableIrq = Mp15xGpioEnableIrq,
-    .disableIrq = Mp15xGpioDisableIrq,
+    .setIrq = Mp1xxGpioSetIrq,
+    .unsetIrq = Mp1xxGpioUnsetIrq,
+    .enableIrq = Mp1xxGpioEnableIrq,
+    .disableIrq = Mp1xxGpioDisableIrq,
 };
 
-static int32_t Mp15xGpioReadDrs(struct Mp15xGpioCntlr *stm32gpio, const struct DeviceResourceNode *node)
+static int32_t Mp1xxGpioReadDrs(struct Mp1xxGpioCntlr *stm32gpio, const struct DeviceResourceNode *node)
 {
     int32_t ret;
     struct DeviceResourceIface *drsOps = NULL;
@@ -450,7 +450,7 @@ static int32_t Mp15xGpioReadDrs(struct Mp15xGpioCntlr *stm32gpio, const struct D
     return HDF_SUCCESS;
 }
 
-static int32_t InitGpioCntlrMem(struct Mp15xGpioCntlr *cntlr)
+static int32_t InitGpioCntlrMem(struct Mp1xxGpioCntlr *cntlr)
 {
     size_t groupMemSize;
     struct GpioGroup *groups = NULL;
@@ -481,7 +481,7 @@ static int32_t InitGpioCntlrMem(struct Mp15xGpioCntlr *cntlr)
     return HDF_SUCCESS;
 }
 
-static void ReleaseGpioCntlrMem(struct Mp15xGpioCntlr *cntlr)
+static void ReleaseGpioCntlrMem(struct Mp1xxGpioCntlr *cntlr)
 {
     if (cntlr == NULL) {
         return;
@@ -507,7 +507,7 @@ static int32_t GpioDriverInit(struct HdfDeviceObject *device)
 {
    
     int32_t ret;
-    struct Mp15xGpioCntlr *stm32gpio = &g_Mp15xGpioCntlr;
+    struct Mp1xxGpioCntlr *stm32gpio = &g_Mp1xxGpioCntlr;
 
     dprintf("%s: Enter", __func__);
     if (device == NULL || device->property == NULL) {
@@ -515,7 +515,7 @@ static int32_t GpioDriverInit(struct HdfDeviceObject *device)
         return HDF_ERR_INVALID_OBJECT;
     }
     //获取属性数据
-    ret = Mp15xGpioReadDrs(stm32gpio, device->property);
+    ret = Mp1xxGpioReadDrs(stm32gpio, device->property);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%s: get gpio device resource fail:%d", __func__, ret);
         return ret;
@@ -562,7 +562,7 @@ static int32_t GpioDriverInit(struct HdfDeviceObject *device)
 static void GpioDriverRelease(struct HdfDeviceObject *device)
 {
     struct GpioCntlr *gpioCntlr = NULL;
-    struct Mp15xGpioCntlr *stm32gpioGpioCntlr = NULL;
+    struct Mp1xxGpioCntlr *stm32gpioGpioCntlr = NULL;
 
     HDF_LOGD("%s: Enter", __func__);
     if (device == NULL) {
@@ -572,7 +572,7 @@ static void GpioDriverRelease(struct HdfDeviceObject *device)
 
     GpioCntlrRemove(gpioCntlr);
 
-    stm32gpioGpioCntlr = (struct Mp15xGpioCntlr *)gpioCntlr;
+    stm32gpioGpioCntlr = (struct Mp1xxGpioCntlr *)gpioCntlr;
     ReleaseGpioCntlrMem(stm32gpioGpioCntlr);
     OsalIoUnmap((void *)stm32gpioGpioCntlr->regBase);
     stm32gpioGpioCntlr->regBase = NULL;

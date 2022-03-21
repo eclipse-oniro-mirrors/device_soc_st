@@ -17,12 +17,12 @@
 
 #define HDF_LOG_TAG stm32mp1_pwm
 
-struct Stm32mp1Pwm
+struct Mp1xxPwm
 {
     struct PwmDev dev;
     TIM_HandleTypeDef stm32mp1;
     volatile uint32_t *base;
-    struct Stm32mp1PwmRegs *reg;
+    struct Mp1xxPwmRegs *reg;
     uint32_t pwmIomux[2];
 };
 
@@ -78,7 +78,7 @@ static GPIO_TypeDef *GPIORemp(uint32_t port)
     return 0;
 }
 
-static void Stm32mp1PwmGpioSet(struct Stm32mp1Pwm *stm32mp1)
+static void Mp1xxPwmGpioSet(struct Mp1xxPwm *stm32mp1)
 {
     GPIO_InitTypeDef GPIO_Init = {0};
     /* init gpio */
@@ -90,7 +90,7 @@ static void Stm32mp1PwmGpioSet(struct Stm32mp1Pwm *stm32mp1)
     HAL_GPIO_Init(GPIORemp(stm32mp1->pwmIomux[0]), &GPIO_Init);
 }
 
-static void Stm32mp1PwmRccConfig(uint32_t num)
+static void Mp1xxPwmRccConfig(uint32_t num)
 {
     RCC_PeriphCLKInitTypeDef TIMx_clock_source_config;
     switch (num)
@@ -186,7 +186,7 @@ static void Stm32mp1PwmRccConfig(uint32_t num)
      
 int32_t HdfPwmSetConfig(struct PwmDev *pwm, struct PwmConfig *config)
 {
-    struct Stm32mp1Pwm *stm32mp1 = (struct Stm32mp1Pwm *)pwm;
+    struct Mp1xxPwm *stm32mp1 = (struct Mp1xxPwm *)pwm;
     stm32mp1->reg->CR1 &= ~1; /* Counter disabled */
     stm32mp1->reg->CR1 |= (1 << 7); /* Auto-reload preload enable, TIMx_ARR register is buffered */
     stm32mp1->reg->CR1 |= (1 << 3); /* Counter stops counting at the next update event (clearing the bit CEN) */
@@ -220,7 +220,7 @@ struct PwmMethod g_pwmOps = {
     .close = HdfPwmClose
 };
 
-static int32_t Stm32mp1PwmPwmProbe(struct Stm32mp1Pwm *stm32mp1, struct HdfDeviceObject *obj)
+static int32_t Mp1xxPwmPwmProbe(struct Mp1xxPwm *stm32mp1, struct HdfDeviceObject *obj)
 {
     uint32_t tmp;
     struct DeviceResourceIface *iface = DeviceResourceGetIfaceInstance(HDF_CONFIG_SOURCE);
@@ -244,16 +244,16 @@ static int32_t Stm32mp1PwmPwmProbe(struct Stm32mp1Pwm *stm32mp1, struct HdfDevic
         return HDF_FAILURE;
     }
 
-    stm32mp1->base = OsalIoRemap(tmp, sizeof(struct Stm32mp1PwmRegs));
+    stm32mp1->base = OsalIoRemap(tmp, sizeof(struct Mp1xxPwmRegs));
     if (stm32mp1->base == NULL) {
         HDF_LOGE("%s: OsalIoRemap fail", __func__);
         return HDF_FAILURE;
     }
 
-    Stm32mp1PwmRccConfig(stm32mp1->dev.num);
-    Stm32mp1PwmGpioSet(stm32mp1);
+    Mp1xxPwmRccConfig(stm32mp1->dev.num);
+    Mp1xxPwmGpioSet(stm32mp1);
 
-    stm32mp1->reg = (struct Stm32mp1PwmRegs *)stm32mp1->base;
+    stm32mp1->reg = (struct Mp1xxPwmRegs *)stm32mp1->base;
     stm32mp1->dev.method = &g_pwmOps;
     stm32mp1->dev.cfg.duty = PWM_DEFAULT_DUTY_CYCLE;
     stm32mp1->dev.cfg.period = PWM_DEFAULT_PERIOD;
@@ -280,20 +280,20 @@ static int32_t HdfPwmBind(struct HdfDeviceObject *obj)
 static int32_t HdfPwmInit(struct HdfDeviceObject *obj)
 {
     int ret;
-    struct Stm32mp1Pwm *stm32mp1 = NULL;
+    struct Mp1xxPwm *stm32mp1 = NULL;
 
     HDF_LOGI("%s: entry", __func__);
     if (obj == NULL) {
         HDF_LOGE("%s: obj is null", __func__);
         return HDF_ERR_INVALID_OBJECT;
     }
-    stm32mp1 = (struct Stm32mp1Pwm *)OsalMemCalloc(sizeof(*stm32mp1));
+    stm32mp1 = (struct Mp1xxPwm *)OsalMemCalloc(sizeof(*stm32mp1));
     if (stm32mp1 == NULL) {
         HDF_LOGE("%s: OsalMemCalloc stm32mp1 error", __func__);
         return HDF_ERR_MALLOC_FAIL;
     }
 
-    ret = Stm32mp1PwmPwmProbe(stm32mp1, obj);
+    ret = Mp1xxPwmPwmProbe(stm32mp1, obj);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%s: error probe, ret is %d", __func__, ret);
         OsalMemFree(stm32mp1);

@@ -1,5 +1,5 @@
 /* 
- * Copyright (c) 2021 Nanjing Xiaoxiongpai Intelligent Technology CO., LIMITED.
+ * Copyright (c) 2021 Nanjing Xiaoxiongpai Intelligent Technology Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -32,7 +32,7 @@ extern "C" {
 #endif /* __cplusplus */
 #endif /* __cplusplus */
 
-struct Mp15xI2cCntlr {
+struct Mp1xxI2cCntlr {
     struct I2cCntlr cntlr;
     OsalSpinlock    spin;
     I2C_HandleTypeDef hi2c;
@@ -43,7 +43,7 @@ struct Mp15xI2cCntlr {
     uint32_t i2cDataIomux[2];
 };
 
-struct Mp15xTransferData {
+struct Mp1xxTransferData {
     struct I2cMsg *msgs;
     int16_t index;
     int16_t count;

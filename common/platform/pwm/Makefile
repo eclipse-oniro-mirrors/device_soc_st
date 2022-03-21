@@ -1,4 +1,4 @@
-# Copyright (c) 2021 Nanjing Xiaoxiongpai Intelligent Technology Co., Ltd.
+# Copyright (c) 2022 Nanjing Xiaoxiongpai Intelligent Technology Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -11,16 +11,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//drivers/adapter/khdf/liteos/hdf.gni")
+include $(LITEOSTOPDIR)/config.mk
+include $(LITEOSTOPDIR)/../../drivers/adapter/khdf/liteos/lite.mk
 
-module_switch = defined(LOSCFG_DRIVERS_HDF_PLATFORM_GPIO)
-hdf_driver("hdf_gpio") {
-    sources = [
-    "stm32mp1_gpio.c",
-  ]
-    include_dirs = [
-     "." ,
-    "../stm32mp1xx_hal/STM32MP1xx_HAL_Driver/Inc",
+MODULE_NAME := hdf_pwm
 
-  ]
-}
+LOCAL_CFLAGS += $(HDF_INCLUDE)
+
+LOCAL_SRCS += stm32mp1_pwm.c
+
+LOCAL_INCLUDE += -I ../stm32mp1xx_hal/STM32MP1xx_HAL_Driver/Inc
+
+LOCAL_CFLAGS += -fstack-protector-strong -Wextra -Wall -Werror -fsigned-char -fno-strict-aliasing -fno-common
+
+include $(HDF_DRIVER)
+

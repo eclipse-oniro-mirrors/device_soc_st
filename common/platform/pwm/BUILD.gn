@@ -20,7 +20,7 @@ hdf_driver(module_name) {
     "stm32mp1_pwm.c"
   ]
   include_dirs = [
-     "." ,
-    "//device/st/drivers/stm32mp1xx_hal/STM32MP1xx_HAL_Driver/Inc",
+    "." ,
+    "../stm32mp1xx_hal/STM32MP1xx_HAL_Driver/Inc",
   ]
 }

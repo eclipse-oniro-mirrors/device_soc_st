@@ -1,5 +1,5 @@
 /* 
- * Copyright (c) 2022 Nanjing Xiaoxiongpai Intelligent Technology CO., LIMITED.
+ * Copyright (c) 2022 Nanjing Xiaoxiongpai Intelligent Technology Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -28,7 +28,7 @@
 #define TX_BUF_SIZE (64)
 #define UART_IRQ_NAME_SIZE  (16)
 
-struct Mp15xUart;
+struct Mp1xxUart;
 
 #define UART_HW_PARITY_NONE   (0)
 #define UART_HW_PARITY_ODD    (1)
@@ -47,14 +47,14 @@ struct Mp15xUart;
 #define UART_HW_STOPBIT_1P5   (1)
 #define UART_HW_STOPBIT_2     (2)
 
-struct Mp15xUartRxCtl {
+struct Mp1xxUartRxCtl {
     char *fifo;
     KRecvBuf rx_krb;            // 输入缓冲区
     OSAL_DECLARE_SEMAPHORE(rx_sem);
-    uint32_t (*stm32mp1_uart_recv_hook)(struct Mp15xUart *uart, char *buf, uint32_t size);
+    uint32_t (*stm32mp1_uart_recv_hook)(struct Mp1xxUart *uart, char *buf, uint32_t size);
 };
 
-struct Mp15xUart {
+struct Mp1xxUart {
     uint32_t num;                   // 当前串口编号
 
     void volatile *base;            // 虚拟地址
@@ -94,24 +94,24 @@ struct Mp15xUart {
 
     // rx
     uint32_t rx_buf_size;                   
-    struct Mp15xUartRxCtl rx_ctl;
+    struct Mp1xxUartRxCtl rx_ctl;
 
     void *priv;
 };
 
-extern void Mp15xUartHwPutc(void *base, char c);
-extern void Mp15xUartHwPuts(void *base, char *s, uint32_t len);
+extern void Mp1xxUartHwPutc(void *base, char c);
+extern void Mp1xxUartHwPuts(void *base, char *s, uint32_t len);
 
-extern uint32_t Mp15xUartIrqHandler(uint32_t irq, void *data);
+extern uint32_t Mp1xxUartIrqHandler(uint32_t irq, void *data);
 
-extern void Mp15xUartDump(struct Mp15xUart *uart);
+extern void Mp1xxUartDump(struct Mp1xxUart *uart);
 
-extern int32_t Mp15xUartHwFifoEnable(struct Mp15xUart *uart, int enable);
-extern int32_t Mp15xUartHwRxEnable(struct Mp15xUart *uart, int enable);
-extern int32_t Mp15xUartHwEnable(struct Mp15xUart *uart, int enable);
-extern int32_t Mp15xUartHwDataBits(struct Mp15xUart *uart, uint32_t bits);
-extern int32_t Mp15xUartHwStopBits(struct Mp15xUart *uart, uint32_t bits);
-extern int32_t Mp15xUartHwParity(struct Mp15xUart *uart, uint32_t parity);
-extern int32_t Mp15xUartHwBaudrate(struct Mp15xUart *uart, uint32_t baudrate);
+extern int32_t Mp1xxUartHwFifoEnable(struct Mp1xxUart *uart, int enable);
+extern int32_t Mp1xxUartHwRxEnable(struct Mp1xxUart *uart, int enable);
+extern int32_t Mp1xxUartHwEnable(struct Mp1xxUart *uart, int enable);
+extern int32_t Mp1xxUartHwDataBits(struct Mp1xxUart *uart, uint32_t bits);
+extern int32_t Mp1xxUartHwStopBits(struct Mp1xxUart *uart, uint32_t bits);
+extern int32_t Mp1xxUartHwParity(struct Mp1xxUart *uart, uint32_t parity);
+extern int32_t Mp1xxUartHwBaudrate(struct Mp1xxUart *uart, uint32_t baudrate);
 
 #endif

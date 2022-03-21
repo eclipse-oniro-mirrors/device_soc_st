@@ -1,4 +1,4 @@
-# Copyright (c) 2022 Nanjing Xiaoxiongpai Intelligent Technology CO., LIMITED.
+# Copyright (c) 2022 Nanjing Xiaoxiongpai Intelligent Technology Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -40,6 +40,11 @@ ifeq ($(LOSCFG_DRIVERS_HDF_PLATFORM_WATCHDOG), y)
     LIB_SUBDIRS    += $(ST_DRIVERS_ROOT)/iwdg
 endif
 
+ifeq ($(LOSCFG_DRIVERS_HDF_PLATFORM_PWM), y)
+    LITEOS_BASELIB += -lhdf_pwm
+    LIB_SUBDIRS    += $(ST_DRIVERS_ROOT)/pwm
+endif
+
 ifeq ($(LOSCFG_DRIVERS_HDF_PLATFORM_UART), y)
     LITEOS_BASELIB += -lhdf_uart
     LIB_SUBDIRS    += $(ST_DRIVERS_ROOT)/uart
@@ -73,6 +78,6 @@ ifeq ($(LOSCFG_DRIVERS_HI3881), y)
 endif
 endif
 
-LITEOS_LD_PATH += -L$(ST_DRIVERS_ROOT)/libs/ohos/llvm/stm32mp157
+LITEOS_LD_PATH += -L$(ST_DRIVERS_ROOT)/libs/ohos/llvm/stm32mp1xx
 
 
