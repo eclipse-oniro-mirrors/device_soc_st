@@ -25,6 +25,10 @@ ifeq ($(LOSCFG_DRIVERS_HDF_PLATFORM_ADC), y)
     LIB_SUBDIRS    += $(ST_DRIVERS_ROOT)/adc
 endif
 
+ifeq ($(LOSCFG_DRIVERS_HDF_PLATFORM_SPI), y)
+    LITEOS_BASELIB += -lhdf_spi
+    LIB_SUBDIRS    += $(ST_DRIVERS_ROOT)/spi
+endif
 
 ifeq ($(LOSCFG_DRIVERS_HDF_PLATFORM_GPIO), y)
     LITEOS_BASELIB += -lhdf_gpio

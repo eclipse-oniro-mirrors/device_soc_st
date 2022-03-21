@@ -1,0 +1,75 @@
+root {
+    platform {
+        spi_i2s_config {
+            template stm32mp1_spi_i2s_device {
+                match_attr = "";
+                busModeSel = 1;    // 0: Disabled; 1: SPI mode; 2: I2S mode.
+                regPBase = 0x44004000;
+                regSize = 0x400;
+                busNum = 0;
+                fifoSize = 4;    // no more than 8.
+                spi_transferMode = 0;
+                spi_bitsPerWord = 8;
+                spi_mode = 19;
+                spi_clkRate = 200000000;
+                spi_speed = 10000000;
+                spi_numCs = 1;
+                /*
+                    NSS    SCK    MISO    MOSI
+                    pins[port, pin, funcNum,    ...]
+                    <port> 0:GPIOA 1:GPIOB 2:GPIOC ...... 10:GPIOK 25:GPIOZ
+                    <pin>  0:PIN0  1:PIN1  2:PIN2  ......
+                    <funcNum> 0-15: AF0-AF15
+                */
+                pins = [0, 4, 5,    0, 5, 5,    0, 6, 5,    0, 7, 5];
+                irqNum = 67;
+            }
+            controller_0x44004000 :: stm32mp1_spi_i2s_device {
+                match_attr = "st_stm32mp157_spi_1";
+                busNum = 1;
+                pins = [0, 0, 15,    25, 0, 5,    25, 1, 5,    25, 2, 5];
+                irqNum = 67;
+            }
+            controller_0x4000B000 :: stm32mp1_spi_i2s_device {
+                match_attr = "st_stm32mp157_spi_2";
+                regPBase = 0x4000B000;
+                busModeSel = 0;
+                busNum = 2;
+                pins = [1, 12, 5,    1, 13, 5,    1, 14, 5,    1, 15, 5];
+                irqNum = 68;
+            }
+            controller_0x4000C000 :: stm32mp1_spi_i2s_device {
+                match_attr = "st_stm32mp157_spi_3";
+                regPBase = 0x4000C000;
+                busModeSel = 0;
+                busNum = 3;
+                pins = [0, 15, 6,    2, 10, 6,    2, 11, 6,    2, 12, 6];
+                irqNum = 83;
+            }
+            controller_0x44005000 :: stm32mp1_spi_i2s_device {
+                match_attr = "st_stm32mp157_spi_4";
+                regPBase = 0x44005000;
+                busModeSel = 0;
+                busNum = 4;
+                pins = [4, 11, 5,    4, 12, 5,    4, 13, 5,    4, 14, 5];
+                irqNum = 116;
+            }
+            controller_0x44009000 :: stm32mp1_spi_i2s_device {
+                match_attr = "st_stm32mp157_spi_5";
+                regPBase = 0x44009000;
+                busModeSel = 0;
+                busNum = 5;
+                pins = [5, 6, 5,    5, 7, 5,    5, 8, 5,    5, 9, 5];
+                irqNum = 117;
+            }
+            controller_0x5C001000 :: stm32mp1_spi_i2s_device {
+                match_attr = "st_stm32mp157_spi_6";
+                regPBase = 0x5C001000;
+                busModeSel = 0;
+                busNum = 6;
+                pins = [6, 8, 5,    6, 13, 5,    6, 12, 5,    6, 14, 5];
+                irqNum = 118;
+            }
+        }
+    }
+}
