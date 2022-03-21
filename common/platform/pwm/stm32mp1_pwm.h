@@ -39,7 +39,7 @@
 #define PWM_DEFAULT_PERIOD     (500 - 1)
 #define PWM_DEFAULT_DUTY_CYCLE (250 - 1)
 
-struct Stm32mp1PwmRegs {
+struct Mp1xxPwmRegs {
     volatile uint32_t CR1;         /*!< TIM control register 1,                   Address offset: 0x00 */
     volatile uint32_t CR2;         /*!< TIM control register 2,                   Address offset: 0x04 */
     volatile uint32_t SMCR;        /*!< TIM slave mode control register,          Address offset: 0x08 */

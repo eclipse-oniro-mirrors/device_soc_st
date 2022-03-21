@@ -33,11 +33,11 @@ extern "C" {
 #endif /* __cplusplus */
 #endif /* __cplusplus */
 
-#define HDF_LOG_TAG gpio_stm32mp15xx
+#define HDF_LOG_TAG gpio_stm32mp1xx
 
-#define STM32MP15X_GPIO_MODER(base)         ((base) + 0x00)
-#define STM32MP15X_GPIO_IDR(base)           ((base) + 0x10)
-#define STM32MP15X_GPIO_BSRR(base)          ((base) + 0x18)
+#define STM32MP1XX_GPIO_MODER(base)         ((base) + 0x00)
+#define STM32MP1XX_GPIO_IDR(base)           ((base) + 0x10)
+#define STM32MP1XX_GPIO_BSRR(base)          ((base) + 0x18)
 
 
 
@@ -53,7 +53,7 @@ struct GpioGroup {
     uint32_t irqSave;
 };
 
-struct Mp15xGpioCntlr {
+struct Mp1xxGpioCntlr {
     struct GpioCntlr cntlr;
     volatile unsigned char *regBase;
     EXTI_TypeDef *exitBase;
@@ -66,7 +66,7 @@ struct Mp15xGpioCntlr {
     struct GpioGroup *groups;
 };
 
-static struct Mp15xGpioCntlr g_Mp15xGpioCntlr = {
+static struct Mp1xxGpioCntlr g_Mp1xxGpioCntlr = {
     .groups = NULL,
     .groupNum = GROUP_MAX,
     .bitNum = BIT_MAX,

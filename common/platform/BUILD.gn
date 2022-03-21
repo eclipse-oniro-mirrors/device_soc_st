@@ -30,7 +30,7 @@ group("drivers") {
 }
 
 config("public") {
-  lib_dirs = [ "//device/soc/st/common/platform/libs/ohos/llvm/stm32mp157" ]
+  lib_dirs = [ "//device/soc/st/common/platform/libs/ohos/llvm/stm32mp1xx" ]
   ldflags = [ "-Wl,--push-state,--whole-archive" ]
 
     ldflags += [ "-lltdc" ]

@@ -71,7 +71,7 @@ static inline void RegWrite(void volatile *base, uint32_t reg, uint32_t val)
     OSAL_WRITEL(val, (uintptr_t)base + reg);
 }
 
-void Mp15xUartDump(struct Mp15xUart *uart)
+void Mp1xxUartDump(struct Mp1xxUart *uart)
 {
 #ifdef STM32MP1_UART_DEBUG
     dprintf("-------------------------------------\r\n");
@@ -92,7 +92,7 @@ void Mp15xUartDump(struct Mp15xUart *uart)
 #endif
 }
 
-int32_t Mp15xUartHwRxEnable(struct Mp15xUart *uart, int enable)
+int32_t Mp1xxUartHwRxEnable(struct Mp1xxUart *uart, int enable)
 {
     uint32_t val;
 
@@ -109,31 +109,31 @@ int32_t Mp15xUartHwRxEnable(struct Mp15xUart *uart, int enable)
     return 0;
 }
 
-void Mp15xUartHwPutc(void *base, char c)
+void Mp1xxUartHwPutc(void *base, char c)
 {
     while ((RegRead(base, USART_ISR) & USART_ISR_TXE) == 0) {};
     RegWrite(base, USART_TDR, c);
 }
 
-void Mp15xUartHwPuts(void *base, char *s, uint32_t len)
+void Mp1xxUartHwPuts(void *base, char *s, uint32_t len)
 {
     uint32_t i;
 
     for (i = 0; i < len; i++) {
         if (*(s + i) == '\n') {
-            Mp15xUartHwPutc(base, '\r');
+            Mp1xxUartHwPutc(base, '\r');
         }
-        Mp15xUartHwPutc(base, *(s + i));
+        Mp1xxUartHwPutc(base, *(s + i));
     }
 }
 
-uint32_t Mp15xUartHwGetIsr(struct Mp15xUart *uart)
+uint32_t Mp1xxUartHwGetIsr(struct Mp1xxUart *uart)
 {
     return RegRead(uart->base, USART_ISR);
 }
 
 // enable uart, and enable tx/rx mode
-int32_t Mp15xUartHwEnable(struct Mp15xUart *uart, int enable)
+int32_t Mp1xxUartHwEnable(struct Mp1xxUart *uart, int enable)
 {
     uint32_t val;
 
@@ -151,7 +151,7 @@ int32_t Mp15xUartHwEnable(struct Mp15xUart *uart, int enable)
     return 0;
 }
 
-int32_t Mp15xUartHwFifoEnable(struct Mp15xUart *uart, int enable)
+int32_t Mp1xxUartHwFifoEnable(struct Mp1xxUart *uart, int enable)
 {
     uint32_t val;
 
@@ -169,7 +169,7 @@ int32_t Mp15xUartHwFifoEnable(struct Mp15xUart *uart, int enable)
 }
 
 // set data bits
-int32_t Mp15xUartHwDataBits(struct Mp15xUart *uart, uint32_t bits)
+int32_t Mp1xxUartHwDataBits(struct Mp1xxUart *uart, uint32_t bits)
 {
     uint32_t val;
 
@@ -191,7 +191,7 @@ int32_t Mp15xUartHwDataBits(struct Mp15xUart *uart, uint32_t bits)
     return 0;
 }
 
-int32_t Mp15xUartHwStopBits(struct Mp15xUart *uart, uint32_t bits)
+int32_t Mp1xxUartHwStopBits(struct Mp1xxUart *uart, uint32_t bits)
 {
     uint32_t val;
 
@@ -210,7 +210,7 @@ int32_t Mp15xUartHwStopBits(struct Mp15xUart *uart, uint32_t bits)
     return 0;
 }
 
-int32_t Mp15xUartHwParity(struct Mp15xUart *uart, uint32_t parity)
+int32_t Mp1xxUartHwParity(struct Mp1xxUart *uart, uint32_t parity)
 {
     uint32_t val;
     val = RegRead(uart->base, USART_CR1);
@@ -238,7 +238,7 @@ int32_t Mp15xUartHwParity(struct Mp15xUart *uart, uint32_t parity)
     return 0;
 }
 
-int32_t Mp15xUartHwBaudrate(struct Mp15xUart *uart, uint32_t baudrate)
+int32_t Mp1xxUartHwBaudrate(struct Mp1xxUart *uart, uint32_t baudrate)
 {
     uint32_t val;
     uint32_t sorce_rate = uart->clock_rate;
@@ -250,7 +250,7 @@ int32_t Mp15xUartHwBaudrate(struct Mp15xUart *uart, uint32_t baudrate)
 }
 
 #define FIFO_SIZE    (128)
-uint32_t Mp15xUartIrqHandler(uint32_t irq, void *data)
+uint32_t Mp1xxUartIrqHandler(uint32_t irq, void *data)
 {
     (void)irq;
 
@@ -259,10 +259,10 @@ uint32_t Mp15xUartIrqHandler(uint32_t irq, void *data)
     uint32_t count = 0;
     int max_count = FIFO_SIZE;
 
-    struct Mp15xUart *uart = (struct Mp15xUart *)data;
-    struct Mp15xUartRxCtl *rx_ctl = &(uart->rx_ctl);
+    struct Mp1xxUart *uart = (struct Mp1xxUart *)data;
+    struct Mp1xxUartRxCtl *rx_ctl = &(uart->rx_ctl);
 
-    if (Mp15xUartHwGetIsr(uart) & USART_ISR_RXNE) {
+    if (Mp1xxUartHwGetIsr(uart) & USART_ISR_RXNE) {
         do {
             // read data from RDR
             ch = RegRead(uart->base, USART_RDR);
@@ -274,7 +274,7 @@ uint32_t Mp15xUartIrqHandler(uint32_t irq, void *data)
                 goto end;
             }
 
-        } while ((Mp15xUartHwGetIsr(uart) & USART_ISR_RXNE) && (max_count-- > 0));
+        } while ((Mp1xxUartHwGetIsr(uart) & USART_ISR_RXNE) && (max_count-- > 0));
 
         if (rx_ctl->stm32mp1_uart_recv_hook)
             rx_ctl->stm32mp1_uart_recv_hook(uart, buf, count);

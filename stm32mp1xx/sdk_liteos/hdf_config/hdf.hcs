@@ -13,5 +13,5 @@
 #include "wifi/wlan_chip_hi3881.hcs"
 
 root {
-    module = "st,stm32mp157";
+    module = "st,stm32mp1xx";
 }

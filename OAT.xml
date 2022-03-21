@@ -61,7 +61,7 @@
         </policylist>
         <filefilterlist>
             <filefilter name="defaultFilter" desc="Files not to check">
-                <filteritem type="filepath" name="common/platform/libs/ohos/llvm/stm32mp157/End User License Agreement.md" desc=""/>
+                <filteritem type="filepath" name="common/platform/libs/ohos/llvm/stm32mp1xx/End User License Agreement.md" desc=""/>
             </filefilter>
             <filefilter name="defaultPolicyFilter" desc="Filters for compatibility，license header policies">
                 <filteritem type="filepath" name="common/platform/stm32mp1xx_hal/STM32MP1xx_HAL_Driver/Src/stm32mp1xx_hal_tim.c" desc=""/>

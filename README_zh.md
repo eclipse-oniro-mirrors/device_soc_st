@@ -18,7 +18,7 @@ device/soc/st
 ├── common                                  # 公共驱动
 │   └── hal                                 # hal适配目录
 │   └── platform                            # 平台驱动适配
-├── stm32mp157                              # 芯片SOC名称
+├── stm32mp1xx                              # 芯片SOC名称
 ├── stm32f4xx                               # 芯片SOC名称
 ```
 

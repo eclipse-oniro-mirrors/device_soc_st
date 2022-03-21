@@ -74,7 +74,7 @@ static int RngRead(char *buffer, size_t bytes)
     return bytes;
 }
 
-void Mp15xRngInit(void)
+void Mp1xxRngInit(void)
 {
     RngInitDev();
     int ret;

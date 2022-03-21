@@ -86,7 +86,7 @@ static GPIO_TypeDef * GPIORemp(uint32_t port)
     return 0;
 }
 
-static void Mp15xI2cCntlrInit(struct Mp15xI2cCntlr *stm32mp1)
+static void Mp1xxI2cCntlrInit(struct Mp1xxI2cCntlr *stm32mp1)
 {
     GPIO_InitTypeDef GPIO_Init = {0};
     I2C_HandleTypeDef *hi2c = (I2C_HandleTypeDef *)&stm32mp1->hi2c;
@@ -108,7 +108,7 @@ static void Mp15xI2cCntlrInit(struct Mp15xI2cCntlr *stm32mp1)
     HAL_I2C_Init(hi2c);
 }
 
-static int32_t Mp15xI2cXferOneMsgPolling(const struct Mp15xI2cCntlr *stm32mp1, const struct Mp15xTransferData *td)
+static int32_t Mp1xxI2cXferOneMsgPolling(const struct Mp1xxI2cCntlr *stm32mp1, const struct Mp1xxTransferData *td)
 {
     int32_t status = HDF_SUCCESS;
     uint8_t val[255];
@@ -137,18 +137,18 @@ end:
     return  status;
 }
 
-static int32_t Mp15xI2cTransfer(struct I2cCntlr *cntlr, struct I2cMsg *msgs, int16_t count)
+static int32_t Mp1xxI2cTransfer(struct I2cCntlr *cntlr, struct I2cMsg *msgs, int16_t count)
 {
     int32_t ret = HDF_SUCCESS;
     unsigned long irqSave;
-    struct Mp15xI2cCntlr *stm32mp1 = NULL;
-    struct Mp15xTransferData td;
+    struct Mp1xxI2cCntlr *stm32mp1 = NULL;
+    struct Mp1xxTransferData td;
 
     if (cntlr == NULL || cntlr->priv == NULL) {
         HDF_LOGE("%s: cntlr lor stm32mp1 null!", __func__);
         return HDF_ERR_INVALID_OBJECT;
     }
-    stm32mp1 = (struct Mp15xI2cCntlr *)cntlr;
+    stm32mp1 = (struct Mp1xxI2cCntlr *)cntlr;
 
     if (msgs == NULL || count <= 0) {
         HDF_LOGE("%s: err parms! count:%d", __func__, count);
@@ -161,7 +161,7 @@ static int32_t Mp15xI2cTransfer(struct I2cCntlr *cntlr, struct I2cMsg *msgs, int
     irqSave = LOS_IntLock();
     while(td.index < td.count)
     {
-        ret = Mp15xI2cXferOneMsgPolling(stm32mp1, &td);
+        ret = Mp1xxI2cXferOneMsgPolling(stm32mp1, &td);
         if (ret != 0) {
             break;
         }
@@ -172,12 +172,12 @@ static int32_t Mp15xI2cTransfer(struct I2cCntlr *cntlr, struct I2cMsg *msgs, int
 }
 
 static const struct I2cMethod g_method = {
-    .transfer = Mp15xI2cTransfer,
+    .transfer = Mp1xxI2cTransfer,
 };
 
-static int32_t Mp15xI2cLock(struct I2cCntlr *cntlr)
+static int32_t Mp1xxI2cLock(struct I2cCntlr *cntlr)
 {
-    struct Mp15xI2cCntlr *stm32mp1 = (struct Mp15xI2cCntlr *)cntlr;
+    struct Mp1xxI2cCntlr *stm32mp1 = (struct Mp1xxI2cCntlr *)cntlr;
     if(stm32mp1 != NULL)
     {
         return OsalSpinLock(&stm32mp1->spin);
@@ -185,20 +185,20 @@ static int32_t Mp15xI2cLock(struct I2cCntlr *cntlr)
     return HDF_SUCCESS;
 }
 
-static void Mp15xI2cUnlock(struct I2cCntlr *cntlr)
+static void Mp1xxI2cUnlock(struct I2cCntlr *cntlr)
 {
-    struct Mp15xI2cCntlr *stm32mp1 = (struct Mp15xI2cCntlr *)cntlr;
+    struct Mp1xxI2cCntlr *stm32mp1 = (struct Mp1xxI2cCntlr *)cntlr;
     if (stm32mp1 != NULL) {
         (void)OsalSpinUnlock(&stm32mp1->spin);
     }
 }
 
 static const struct I2cLockMethod g_lockOps = {
-    .lock = Mp15xI2cLock,
-    .unlock = Mp15xI2cUnlock,
+    .lock = Mp1xxI2cLock,
+    .unlock = Mp1xxI2cUnlock,
 };
 
-static int32_t Mp15xI2cReadDrs(struct Mp15xI2cCntlr *stm32mp1, const struct DeviceResourceNode *node)
+static int32_t Mp1xxI2cReadDrs(struct Mp1xxI2cCntlr *stm32mp1, const struct DeviceResourceNode *node)
 {
     int32_t ret;
     struct DeviceResourceIface *drsOps = NULL;
@@ -286,7 +286,7 @@ static int32_t Mp15xI2cReadDrs(struct Mp15xI2cCntlr *stm32mp1, const struct Devi
     return HDF_SUCCESS;
 }
 
-static void Mp15xI2cRccConfig(uint32_t bus)
+static void Mp1xxI2cRccConfig(uint32_t bus)
 {
     RCC_PeriphCLKInitTypeDef I2C2_clock_source_config;
 
@@ -333,21 +333,21 @@ static void Mp15xI2cRccConfig(uint32_t bus)
     }
 }
 
-static int32_t Mp15xI2cParseAndInit(struct HdfDeviceObject *device, const struct DeviceResourceNode *node)
+static int32_t Mp1xxI2cParseAndInit(struct HdfDeviceObject *device, const struct DeviceResourceNode *node)
 {
     int32_t ret;
-    struct Mp15xI2cCntlr *stm32mp1 = NULL;
+    struct Mp1xxI2cCntlr *stm32mp1 = NULL;
 
     (void)device;
 
-    stm32mp1 = (struct Mp15xI2cCntlr *)OsalMemCalloc(sizeof(*stm32mp1));
+    stm32mp1 = (struct Mp1xxI2cCntlr *)OsalMemCalloc(sizeof(*stm32mp1));
     if (stm32mp1 == NULL) {
         HDF_LOGE("%s: malloc stm32mp1 fail!", __func__);
         return HDF_ERR_MALLOC_FAIL;
     }
 
 
-    ret = Mp15xI2cReadDrs(stm32mp1, node);
+    ret = Mp1xxI2cReadDrs(stm32mp1, node);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%s: read drs fail! ret:%d", __func__, ret);
         goto __ERR__;
@@ -361,9 +361,9 @@ static int32_t Mp15xI2cParseAndInit(struct HdfDeviceObject *device, const struct
         goto __ERR__;
     }
 
-    Mp15xI2cRccConfig(stm32mp1->bus);
+    Mp1xxI2cRccConfig(stm32mp1->bus);
 
-    Mp15xI2cCntlrInit(stm32mp1);
+    Mp1xxI2cCntlrInit(stm32mp1);
 
     stm32mp1->cntlr.priv    = (void *)node;
     stm32mp1->cntlr.busId   = stm32mp1->bus;
@@ -405,7 +405,7 @@ int32_t HdfI2cDeviceInit(struct HdfDeviceObject *device)
 
     ret = HDF_SUCCESS;
     DEV_RES_NODE_FOR_EACH_CHILD_NODE(device->property, childNode) {
-        ret = Mp15xI2cParseAndInit(device, childNode);
+        ret = Mp1xxI2cParseAndInit(device, childNode);
         if (ret != HDF_SUCCESS) {
             break;
         }
@@ -413,12 +413,12 @@ int32_t HdfI2cDeviceInit(struct HdfDeviceObject *device)
 
     return ret;
 }
-static void Mp15xI2cRemoveByNode(const struct DeviceResourceNode *node)
+static void Mp1xxI2cRemoveByNode(const struct DeviceResourceNode *node)
 {
     int32_t ret;
     int16_t bus;
     struct I2cCntlr *cntlr = NULL;
-    struct Mp15xI2cCntlr *stm32mp1 = NULL;
+    struct Mp1xxI2cCntlr *stm32mp1 = NULL;
     struct DeviceResourceIface *drsOps = NULL;
 
     drsOps = DeviceResourceGetIfaceInstance(HDF_CONFIG_SOURCE);
@@ -437,7 +437,7 @@ static void Mp15xI2cRemoveByNode(const struct DeviceResourceNode *node)
     if (cntlr != NULL && cntlr->priv == node) {
         I2cCntlrPut(cntlr);
         I2cCntlrRemove(cntlr);
-        stm32mp1 = (struct Mp15xI2cCntlr *)cntlr;
+        stm32mp1 = (struct Mp1xxI2cCntlr *)cntlr;
         OsalIoUnmap((void *)stm32mp1->regBasePhy);
         (void)OsalSpinDestroy(&stm32mp1->spin);
         OsalMemFree(stm32mp1);
@@ -456,7 +456,7 @@ void HdfI2cDeviceRelease(struct HdfDeviceObject *device)
         return;
     }
     DEV_RES_NODE_FOR_EACH_CHILD_NODE(device->property, childNode) {
-        Mp15xI2cRemoveByNode(childNode);
+        Mp1xxI2cRemoveByNode(childNode);
     }
 }
 
