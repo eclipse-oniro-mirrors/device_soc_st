@@ -52,7 +52,7 @@
             <policy name="projectPolicy" desc="">
                 <policyitem type="copyright" name="Huawei Technologies Co., Ltd." path=".*" rule="may" group="defaultGroup" filefilter="copyrightPolicyFilter" desc="华为技术有限公司版权声明"/>
                 <policyitem type="copyright" name="ARM Limited. All rights reserved." path=".*" rule="may" group="defaultGroup" filefilter="copyrightPolicyFilter" desc="华为终端有限公司版权声明"/>
-                <policyitem type="copyright" name="Talkweb Co., Ltd." path=".*" rule="may" group="defaultGroup" filefilter="copyrightPolicyFilter" desc="小海思开发代码"/>
+                <policyitem type="copyright" name="Talkweb Co., Ltd." path=".*" rule="may" group="defaultGroup" filefilter="copyrightPolicyFilter" desc="拓维信息系统股份有限公司版权声明"/>
                 <policyitem type="copyright" name="Nanjing Xiaoxiongpai Intelligent Technology Co., Ltd." path=".*" rule="may" group="defaultGroup" filefilter="copyrightPolicyFilter" desc="南京小熊派智能科技有限公司版权声明"/>
                 <policyitem type="copyright" name="STMicroelectronics." path=".*" rule="may" group="defaultGroup" filefilter="copyrightPolicyFilter" desc="IBM Corp"/>
                 <policyitem type="license" name="BSD-3-Clause" path=".*" desc="兼容license"/>
