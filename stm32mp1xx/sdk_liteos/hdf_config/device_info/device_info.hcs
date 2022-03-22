@@ -67,12 +67,6 @@
                     serviceName = "HDF_PLATFORM_SPI_1";
                     deviceMatchAttr = "st_stm32mp157_spi_1";
                 }
-                device1 :: deviceNode {
-                    policy = 0;
-                    priority = 50;
-                    permission = 0644;
-                    moduleName = "stm32mp157_spi_test";
-                }
             }
 
             device_mmc:: device {
