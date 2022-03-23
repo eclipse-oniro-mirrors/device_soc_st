@@ -15,12 +15,11 @@
 
 #include "securec.h"
 #include "sys/stat.h"
-#include "littlefs.h"
-#include "lfs.h"
 #include "utils_file.h"
 #include "fcntl.h"
-
-
+#if (defined(LOSCFG_FS_LITTLEFS) && defined(LOSCFG_DRIVERS_HDF_PLATFORM_SPI))
+#include "littlefs.h"
+#include "lfs.h"
 #define LITTLEFS_MAX_LFN_LEN 120
 #define OFFSET_FD   3
 
@@ -140,3 +139,4 @@ int HalFileSeek(int fd, int offset, unsigned int whence)
     }
     return _lseek(fd, (off_t)offset, whence);
 }
+#endif
