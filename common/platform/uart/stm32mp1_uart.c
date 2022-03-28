@@ -134,8 +134,6 @@ static inline int32_t Mp1xxUartGetClock(struct Mp1xxUart *uart)
         otherwise, use the default clock rate
     */
     if (uart->clock_source != NULL) {
-        // get clock source real rate.
-        // ...
         ret = HDF_SUCCESS;
     }
 
@@ -312,14 +310,19 @@ stm32mp1_uart_write_out:
 
     OsalSpinUnlock(&(uart->lock));
 
-    return send_size;
+    return ret;
 }
 
 static int32_t Mp1xxUartGetBaud(struct UartHost *host, uint32_t *baudRate)
 {
     int32_t ret = HDF_SUCCESS;
-    struct Mp1xxUart *uart = (struct Mp1xxUart *)host->priv;
-
+    struct Mp1xxUart *uart =NULL;
+    if (host == NULL || host->priv == NULL || baudRate == NULL) {
+        HDF_LOGE("%s: invalid parameter", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    uart = (struct Mp1xxUart *)host->priv;
+    
     OsalSpinLock(&(uart->lock));
 
     if (uart->state != UART_STATE_USEABLE) {
@@ -371,8 +374,14 @@ stm32mp1_uart_set_baud_out:
 static int32_t Mp1xxUartGetAttribute(struct UartHost *host, struct UartAttribute *attribute)
 {
     int32_t ret = HDF_SUCCESS;
-    struct Mp1xxUart *uart = (struct Mp1xxUart *)host->priv;
-    struct UartAttribute *attr = (struct UartAttribute *)uart->priv;
+    struct Mp1xxUart *uart = NULL;
+    struct UartAttribute *attr = NULL;
+    if (host == NULL || host->priv == NULL || attribute == NULL) {
+        HDF_LOGE("%s: invalid parameter", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    uart = (struct Mp1xxUart *)host->priv;
+    attr = (struct UartAttribute *)uart->priv;
 
     OsalSpinLock(&(uart->lock));
 
@@ -386,25 +395,23 @@ static int32_t Mp1xxUartGetAttribute(struct UartHost *host, struct UartAttribute
 static int32_t Mp1xxUartSetAttribute(struct UartHost *host, struct UartAttribute *attribute)
 {
     int32_t ret = HDF_SUCCESS;
-    struct Mp1xxUart *uart = (struct Mp1xxUart *)host->priv;
-    struct UartAttribute *attr = (struct UartAttribute *)uart->priv;
+    struct Mp1xxUart *uart = NULL;
+    struct UartAttribute *attr = NULL;
+    if (host == NULL || host->priv == NULL || attribute == NULL) {
+        HDF_LOGE("%s: invalid parameter", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    uart = (struct Mp1xxUart *)host->priv;
+    attr = (struct UartAttribute *)uart->priv;
 
     OsalSpinLock(&(uart->lock));
-
-    // 1. check attr
-    if (attribute->dataBits != UART_ATTR_DATABIT_8 || attribute->stopBits != UART_ATTR_STOPBIT_1) {
-        HDF_LOGE("%s: unsupport databits or stopbit.\r\n", __func__);
-        ret = HDF_FAILURE;
-        goto stm32mp1_uart_set_attribute_out;
-    }
 
     // 保存新配置
     memcpy_s(attr, sizeof(struct UartAttribute), attribute, sizeof(struct UartAttribute));
 
     // 根据新配置，更新寄存器
     ret = stm32mp1_uart_config(uart);
-
-stm32mp1_uart_set_attribute_out:
+    dprintf("%s--------%d\r\n",__func__,ret);
     OsalSpinUnlock(&(uart->lock));
     return ret;
 }
