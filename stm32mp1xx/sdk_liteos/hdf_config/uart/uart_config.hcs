@@ -18,5 +18,11 @@ root {
             reg_base = 0x40010000;
             interrupt = 84;
         }
+        controller_0x40011000 :: uart_controller {
+            match_attr = "stm32mp1_uart_5";
+            num = 5;
+            reg_base = 0x40011000;
+            interrupt = 85;
+        }
     }
 }
