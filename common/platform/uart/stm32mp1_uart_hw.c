@@ -179,7 +179,10 @@ int32_t Mp1xxUartHwDataBits(struct Mp1xxUart *uart, uint32_t bits)
 
     switch (bits) {
         case UART_HW_DATABIT_8:
-            // val = val;
+            val |= USART_CR1_WL_8B;
+            break;
+        case UART_HW_DATABIT_7:
+            val |= USART_CR1_WL_7B;
             break;
         default:
             HDF_LOGE("only support 8b.\r\n");

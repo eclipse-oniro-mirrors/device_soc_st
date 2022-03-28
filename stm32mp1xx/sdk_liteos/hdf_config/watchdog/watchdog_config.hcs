@@ -9,9 +9,6 @@ root {
 
             timeout_sec = 32;       // default iwdg timeout(s)
 
-            auto_feed = false;
-            auto_feed_period = 10;
-
             start = false;
 
             clock_rate = 32000;     // default clock source rate
@@ -23,7 +20,6 @@ root {
             match_attr = "stm32mp1_iwdg_1";
             num = 1;
             reg_base = 0x5A002000;
-            auto_feed = true;
             start = true;
         }
     }

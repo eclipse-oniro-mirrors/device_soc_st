@@ -126,10 +126,6 @@ struct Mp1xxIwdg {
     uint32_t rate;              // 时钟源频率
     char *clock_source;          // 时钟源名称
 
-    bool auto_feed;                             // 是否自动喂狗
-    uint32_t auto_feed_period;                  // 自动喂狗周期
-    OSAL_DECLARE_THREAD(feed_dog_thread);      // 喂狗线程
-
     uint32_t min_timeout;           // 最小超时时间
     uint32_t max_hw_heartbeat_ms;   // 最大超时时间
 };
@@ -207,7 +203,7 @@ int32_t Mp1xxIwdgStart(struct WatchdogCntlr *wdt)
     // 等待状态寄存器 SR_PVU | SR_RVU 复位
     while ((iwdg_sr = Mp1xxIwdgGetSr(iwdg)) & (SR_PVU | SR_RVU))
     {
-        OsalMDelay(10);
+        // OsalMSleep(10);
         if(!(--i)) {
             HDF_LOGE("Fail to set prescaler, reload regs.");
             return HDF_FAILURE;
@@ -331,49 +327,6 @@ static struct WatchdogMethod g_stm32mp1_iwdg_ops = {
     .stop = NULL
 };
 
-static int Mp1xxIwdgFeedTaskFunc(void *arg)
-{
-    // auto feed dog task
-    struct WatchdogCntlr *wdt = (struct WatchdogCntlr *)arg;
-    struct Mp1xxIwdg *iwdg = (struct Mp1xxIwdg *)wdt->priv;
-
-    while (1)
-    {
-        if (iwdg->start) {
-            Mp1xxIwdgFeed(wdt);
-        }
-        OsalSleep(iwdg->auto_feed_period);
-    }
-
-    return 0;
-}
-
-// create timer for auto feed
-static int32_t Mp1xxIwdgCreateFeedDogTask(struct WatchdogCntlr *wdt)
-{
-#define TASK_NAME_SIZE  (16)
-    int32_t ret;
-    struct Mp1xxIwdg *iwdg = (struct Mp1xxIwdg *)wdt->priv;
-    struct OsalThreadParam param = {0};
-    char task_name[TASK_NAME_SIZE] = {0};
-
-    // create thread
-    ret = OsalThreadCreate(&(iwdg->feed_dog_thread), (OsalThreadEntry)Mp1xxIwdgFeedTaskFunc, (void *)wdt);
-    if (ret != HDF_SUCCESS) {
-        HDF_LOGE("OsalThreadCreate fail, ret : %#x.\r\n", ret);
-        return HDF_FAILURE;
-    }
-
-    // get task name
-    snprintf_s(task_name, TASK_NAME_SIZE, TASK_NAME_SIZE - 1, "iwdg%d_auto_feed", iwdg->num);
-
-    param.priority = OSAL_THREAD_PRI_DEFAULT;
-    param.stackSize = DEFAULT_TASK_STACK_SIZE;
-    param.name = task_name;
-
-    return OsalThreadStart(&(iwdg->feed_dog_thread), &param);
-}
-
 static int32_t Mp1xxIwdgReadDrs(struct Mp1xxIwdg *iwdg, const struct DeviceResourceNode *node)
 {
     int32_t ret;
@@ -423,14 +376,6 @@ static int32_t Mp1xxIwdgReadDrs(struct Mp1xxIwdg *iwdg, const struct DeviceResou
     // start
     iwdg->start = drsOps->GetBool(node, "start");
 
-    // auto_feed
-    iwdg->auto_feed = drsOps->GetBool(node, "auto_feed");
-
-    // auto_feed_period
-    ret = drsOps->GetUint32(node, "auto_feed_period", &iwdg->auto_feed_period, 10);
-    if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s: read auto_feed_period fail!", __func__);
-    }
 
     return HDF_SUCCESS;
 }
@@ -511,14 +456,6 @@ static int32_t Mp1xxIwdgInit(struct HdfDeviceObject *device)
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("Mp1xxIwdgSetTimeout fail.");
         return HDF_FAILURE;
-    }
-
-    // if need aotu feed, create a task
-    if (iwdg->auto_feed) {
-        ret = Mp1xxIwdgCreateFeedDogTask(wdt);
-        if (ret != HDF_SUCCESS) {
-            HDF_LOGE("Mp1xxIwdgCreateFeedDogTask fail, ret : %#x.", ret);
-        }
     }
 
     return HDF_SUCCESS;
