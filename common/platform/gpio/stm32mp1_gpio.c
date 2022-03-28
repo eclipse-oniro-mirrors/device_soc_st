@@ -278,7 +278,6 @@ static int32_t Mp1xxGpioSetIrq(struct GpioCntlr *cntlr, uint16_t gpio, uint16_t 
 {
     int32_t ret = HDF_SUCCESS;
     struct GpioGroup *group = NULL;
-    (void)mode;
     unsigned int bitNum = Mp1xxToBitNum(gpio);
     
     ret = Mp1xxGetGroupByGpioNum(cntlr, gpio, &group);
@@ -295,7 +294,7 @@ static int32_t Mp1xxGpioSetIrq(struct GpioCntlr *cntlr, uint16_t gpio, uint16_t 
     EXTI_HandleTypeDef hexti;
 
     EXTI_ConfigStructure.Line = EXTI_GPIO | EXTI_EVENT | EXTI_REG1 |bitNum;
-    EXTI_ConfigStructure.Trigger = EXTI_TRIGGER_FALLING;
+    EXTI_ConfigStructure.Trigger = mode;
     EXTI_ConfigStructure.GPIOSel = Mp1xxToGroupNum(gpio);
     EXTI_ConfigStructure.Mode = EXTI_MODE_C1_INTERRUPT;
 
