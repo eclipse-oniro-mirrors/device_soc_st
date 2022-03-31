@@ -53,4 +53,10 @@ config DRIVERS_HI3881
       depends on DRIVERS_HDF_WIFI
       help
         Answer Y to enable Hi3881 Host driver.
-  
+config HW_RANDOM_ENABLE
+        depends on DRIVERS_RANDOM 
+        bool "Select hw random"
+        default y
+        help
+        Answer Y to select hw random.
+

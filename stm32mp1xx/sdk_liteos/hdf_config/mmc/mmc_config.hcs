@@ -27,7 +27,7 @@ root {
 
             controller_0x58005000 :: mmc_controller {
                 match_attr = "st_stm32mp1_sdmmc_sd";
-                hostId = 0;
+                hostId = 1;
                 regBase = 0x58005000;
                 irqNum = 81;
                 devType = 1;                            // sd
@@ -37,7 +37,7 @@ root {
 
             controller_0x58007000 :: mmc_controller {
                 match_attr = "st_stm32mp1_sdmmc_emmc";
-                hostId = 1;
+                hostId = 0;
                 regBase = 0x58007000;
                 irqNum = 156;
                 devType = 0;                            // emmc
