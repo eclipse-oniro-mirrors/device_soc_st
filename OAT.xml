@@ -67,16 +67,12 @@
             </filefilter>
             <filefilter name="defaultPolicyFilter" desc="Filters for compatibility，license header policies">
                 <filteritem type="filepath" name="common/platform/stm32mp1xx_hal/STM32MP1xx_HAL_Driver/Src/stm32mp1xx_hal_tim.c" desc=""/>
-                <filteritem type="filepath" name="common/platform/uart/BUILD.gn" desc=""/>
                 <filteritem type="filepath" name="common/platform/stm32mp1xx_hal/STM32MP1xx_HAL_Driver/Src/stm32mp1xx_hal_i2c.c" desc=""/>
                 <filteritem type="filepath" name="common/platform/stm32mp1xx_hal/STM32MP1xx_HAL_Driver/Src/stm32mp1xx_hal_ltdc.c" desc=""/>
                 <filteritem type="filepath" name="common/platform/wlan/hi3881/wifi_cfg" desc=""/>
-                <filteritem type="filepath" name="common/platform/spi/stm32mp1_spi.c" desc="BSD or GPL"/>
-                <filteritem type="filepath" name="common/platform/spi/stm32mp1_spi.h" desc="BSD or GPL"/>
             </filefilter>
 	        <filefilter name="copyrightPolicyFilter" desc="Filters for copyright header policies">
                 <filteritem type="filepath" name="common/platform/stm32mp1xx_hal/STM32MP1xx_HAL_Driver/Src/stm32mp1xx_hal_tim.c" desc=""/>
-                <filteritem type="filepath" name="common/platform/uart/BUILD.gn" desc=""/>
                 <filteritem type="filepath" name="common/platform/stm32mp1xx_hal/STM32MP1xx_HAL_Driver/Src/stm32mp1xx_hal_i2c.c" desc=""/>
                 <filteritem type="filepath" name="common/platform/stm32mp1xx_hal/STM32MP1xx_HAL_Driver/Src/stm32mp1xx_hal_ltdc.c" desc=""/>
                 <filteritem type="filepath" name="common/platform/wlan/hi3881/wifi_cfg" desc=""/>
